@@ -1,35 +1,8 @@
 
 #include <stdio.h>
+#include "verify.h"
 
-int reverse(int iData){
-    int iSign;
-    unsigned iValue = (unsigned int)iData;
-    unsigned int iSource;
-    unsigned int iMax = ((unsigned int)1 << 31);
-    if(iData < 0){
-        iSign = -1;
-        iValue = (0xFFFFFFFF - iValue) + 1;
-    }else{
-        iSign = 1;
-        iMax--;
-    }
-
-    unsigned int iResult = 0;
-    while(iValue){
-        if(iResult){
-            if(iMax / iResult < 10){return 0;}
-        }
-        iResult *= 10;
-        if(iResult >= iMax){
-            return 0;
-        }
-        if(iMax - iResult < iValue % 10){return 0;}
-        iResult += (iValue % 10);
-        iValue /= 10;
-    }
-
-    return iResult * iSign;
-}
+#define M_TEST_EXAM rVRF_Reverse
 
 int main(void){
     struct sTest{
@@ -47,8 +20,21 @@ int main(void){
     for(iCon = 0 ; iCon < iLength ; iCon++){
         printf("Test Case [%d], Expactation = %d,", mTest[iCon].iNO, mTest[iCon].iExp);
         int iResult;
-        iResult = reverse(mTest[iCon].iData);
-        printf(" Result = %d\n", iResult);
+        iResult = M_TEST_EXAM(mTest[iCon].iData);
+        printf(" Result = %d ", iResult);
+        unsigned char iTest = iResult == mTest[iCon].iExp;
+        if(iTest){
+            printf("[PASS]");
+        }else{
+            printf("[FAIL]");
+        }
+        printf("\n");
     }
-    
+    if(iCon == iLength){
+        printf("[PASS]");
+    }
+    else{
+        printf("[FAIL]");
+    }
+    printf("\n");
 }
