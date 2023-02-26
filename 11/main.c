@@ -17,7 +17,6 @@ int maxArea(int* height, int heightSize){
                 iTemp = iHeight * (iConRight - iConLeft);
                 if(iTemp >= iMax){
                     iMax = iTemp;
-                    //iLastRight = iConRight;
                 }
             }
             iLastHeight = height[iConLeft];
@@ -37,6 +36,7 @@ int main(int argc, const char * argv[]) {
 #define M_TEST_INPUT(N, ...) int iHeight_##N[] = __VA_ARGS__
     //      Data
     M_TEST_INPUT(1, {1, 8, 6, 2, 5, 4, 8, 3, 7});
+    M_TEST_INPUT(2, {1, 1});
     //  Test
     //      Structure
     struct sTest{
@@ -48,7 +48,8 @@ int main(int argc, const char * argv[]) {
 #define M_TEST_COLLECTION(N, E) {N, E, {iHeight_##N, sizeof(iHeight_##N) / sizeof(int)}}
     //      Data
     struct sTest mTest[] = {
-        M_TEST_COLLECTION(1, 49)
+        M_TEST_COLLECTION(1, 49),
+        M_TEST_COLLECTION(2, 1)
     };
     
     unsigned int iLength = sizeof(mTest) / sizeof(struct sTest);
