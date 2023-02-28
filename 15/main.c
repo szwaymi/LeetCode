@@ -2,7 +2,60 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void rPrintS(int *piSeries, unsigned int iSize){
+    unsigned int iCon;
+    for(iCon = 0 ; iCon < iSize ; iCon++){
+        printf("%d ", piSeries[iCon]);
+    }
+    printf("\n");
+}
+
+void rSort(int *piSeries, unsigned int iSize){
+    
+    if(iSize <= 1){return;}
+    
+    int *piL = piSeries + 1;
+    int *piR = piSeries + iSize - 1;
+    
+    if(piL == piR){
+        if(*piSeries > *piL){
+            int iTemp = *piL;
+            *piL = *piSeries;
+            *piSeries = iTemp;
+        }
+        return;
+    }
+    
+    while(piL < piR){
+        while(*piSeries <= *piR  && piR > piL){
+            piR--;
+        }
+        while(*piSeries > *piL && piL < piR){
+            piL++;
+        }
+        if(piL != piR){
+            int iTemp = *piR;
+            *piR = *piL;
+            *piL = iTemp;
+        }else{
+            int iTemp = *piSeries;
+            *piSeries = *piL;
+            *piL = iTemp;
+        }
+    }
+    rSort(piSeries, (unsigned int)(piR - piSeries) + 1);
+    rSort(piR + 1, iSize - (unsigned int)(piL - piSeries) - 1);
+}
+void rPrint(int *piSeries, unsigned int iSize){
+    unsigned int iCon;
+    for(iCon = 0 ; iCon < iSize ; iCon++){
+        printf("%d ", piSeries[iCon]);
+    }
+    printf("\n");
+}
 int** threeSum(int* piSeries, int iSize, int* piResultRows, int** ppiResultColumns){
+    rSort(piSeries, iSize);
+    rPrint(piSeries, iSize);
     printf("\n");
     struct sResult{
         int *piSeries;
@@ -13,69 +66,41 @@ int** threeSum(int* piSeries, int iSize, int* piResultRows, int** ppiResultColum
     unsigned int iConY;
     unsigned int iConZ;
     unsigned int iResults = 0;
-    int iSum = 0;
+    int iRequire;
     struct sResult *pmResults = NULL;
     for(iConX = 0 ; iConX < iSize - 2 ; iConX++){
-        iSum = piSeries[iConX];
-        for(iConY = iConX +1 ; iConY < iSize - 1 ; iConY++){
-            iSum += piSeries[iConY];
-            for(iConZ = iConY + 1 ; iConZ < iSize ; iConZ++){
-                if(iSum + piSeries[iConZ] == 0){
-                    
-                    iResultTemp[0] = piSeries[iConX];
-                    if(piSeries[iConY] < iResultTemp[0]){
-                        iResultTemp[1] = iResultTemp[0];
-                        iResultTemp[0] = piSeries[iConY];
-                    }else{
-                        iResultTemp[1] = piSeries[iConY];
-                    }
-                    if(piSeries[iConZ] < iResultTemp[0]){
-                        iResultTemp[2] = iResultTemp[1];
-                        iResultTemp[1] = iResultTemp[0];
-                        iResultTemp[0] = piSeries[iConZ];
-                    }else if(piSeries[iConZ] < iResultTemp[1]){
-                        iResultTemp[2] = iResultTemp[1];
-                        iResultTemp[1] = piSeries[iConZ];
-                    }else{
-                        iResultTemp[2] = piSeries[iConZ];
-                    }
-                    
-                    struct sResult **ppmResult = &pmResults;
-                    struct sResult *pmResult = NULL;
-                    unsigned char iCached = 0;
-                    while(*ppmResult){
-                        pmResult = *ppmResult;
-                        if(pmResult->piSeries[0] == iResultTemp[0]){
-                            if(pmResult->piSeries[1] == iResultTemp[1]){
-                                if(pmResult->piSeries[2] == iResultTemp[2]){
-                                    iCached = 1;
-                                    break;
-                                }else if(iResultTemp[2] < pmResult->piSeries[2]){
-                                    break;
-                                }
-                            }else if(iResultTemp[1] < pmResult->piSeries[1]){
-                                break;
-                            }
-                        }else if(iResultTemp[0] < pmResult->piSeries[0]){
-                            break;
-                        }
-                        ppmResult = &(*ppmResult)->pmNext;
-                    }
-                    if(iCached){
-                        continue;
-                    }else{
-                        pmResult = (struct sResult *)malloc(sizeof(struct sResult));
-                    }
-                    pmResult->piSeries = (int *)malloc(sizeof(int) * 3);
-                    pmResult->piSeries[0] = iResultTemp[0];
-                    pmResult->piSeries[1] = iResultTemp[1];
-                    pmResult->piSeries[2] = iResultTemp[2];
-                    pmResult->pmNext = *ppmResult;
-                    *ppmResult = pmResult;
-                    iResults++;
-                }
+        if(iConX > 0 && piSeries[iConX - 1] == piSeries[iConX]){
+            continue;
+        }
+        for(iConY = iConX + 1 ; iConY < iSize - 1 ; iConY++){
+            if(iConY > iConX + 1 && piSeries[iConY - 1] == piSeries[iConY]){
+                continue;
             }
-            iSum -= piSeries[iConY];
+            iRequire = 0 - piSeries[iConX] - piSeries[iConY];
+            unsigned int iLeft = iConY + 1;
+            unsigned int iRight = iSize - 1;
+            int iMiddle;
+            while(iRight >= iLeft){
+                iMiddle = (iRight + iLeft) / 2;
+                if(piSeries[iMiddle] == iRequire){
+                    break;
+                }else if(piSeries[iMiddle] < iRequire){
+                    iLeft = iMiddle + 1;
+                }else{
+                    iRight = iMiddle - 1;
+                }
+                iMiddle = -1;
+            }
+            if(iMiddle != -1){
+                struct sResult *pmResult = (struct sResult *)malloc(sizeof(struct sResult));
+                pmResult->piSeries = (int *)malloc(sizeof(int) * 3);
+                pmResult->piSeries[0] = piSeries[iConX];
+                pmResult->piSeries[1] = piSeries[iConY];
+                pmResult->piSeries[2] = piSeries[iMiddle];
+                pmResult->pmNext = pmResults;
+                pmResults = pmResult;
+                iResults++;
+            }
         }
     }
     
@@ -120,6 +145,8 @@ int main(void){
     M_TEST_EXP(68, {-2, 0, 2},{-2, 1, 1});
     M_TEST_INPUT(107, {3,0,-2,-1,1,2});
     M_TEST_EXP(107, {-2,-1,3},{-2,0,2},{-1,0,1});
+    M_TEST_INPUT(137, {-1,0,1,2,-1,-4,-2,-3,3,0,4});
+    M_TEST_EXP(137, {-4,0,4},{-4,1,3},{-3,-1,4},{-3,0,3},{-3,1,2},{-2,-1,3},{-2,0,2},{-1,-1,2},{-1,0,1});
     //  Constructure
     struct sTest{
         unsigned int iNO;
@@ -129,7 +156,9 @@ int main(void){
     struct sTest mTest[]={
         //M_TEST_COLLECTION(1),
         //M_TEST_COLLECTION(68)
-        M_TEST_COLLECTION(107)
+        //M_TEST_COLLECTION(107)
+        //M_TEST_COLLECTION((137),
+        M_TEST_COLLECTION(137)
     };
     
     unsigned int iLength = sizeof(mTest) / sizeof(struct sTest);
