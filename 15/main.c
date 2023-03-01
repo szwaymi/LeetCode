@@ -52,9 +52,12 @@ void rSort(int *piSeries, unsigned int iSize){
 	}
 }
 int** threeSum(int* piSeries, int iSize, int* piResultRows, int** ppiResultColumns){
+	int iMax;
     rSort(piSeries, iSize);
-    rPrint(piSeries, iSize);
-    printf("\n");
+	iMax = *(piSeries + iSize - 1);
+
+    //rPrint(piSeries, iSize);
+    //printf("\n");
     struct sResult{
         int *piSeries;
         struct sResult *pmNext;
@@ -62,43 +65,46 @@ int** threeSum(int* piSeries, int iSize, int* piResultRows, int** ppiResultColum
     int iResultTemp[3];
     unsigned int iConX;
     unsigned int iConY;
-    unsigned int iConZ;
     unsigned int iResults = 0;
     int iRequire;
     struct sResult *pmResults = NULL;
-    for(iConX = 0 ; iConX < iSize - 2 ; iConX++){
+    for(iConX = 0 ; iConX < iSize - 2 && piSeries[iConX] <= 0 ; iConX++){
         if(iConX > 0 && piSeries[iConX - 1] == piSeries[iConX]){
             continue;
         }
-        for(iConY = iConX + 1 ; iConY < iSize - 1 ; iConY++){
+        for(iConY = iConX + 1 ; iConY < iSize - 1 && (piSeries[iConX] + piSeries[iConY] <= 0); iConY++){
             if(iConY > iConX + 1 && piSeries[iConY - 1] == piSeries[iConY]){
                 continue;
             }
             iRequire = 0 - piSeries[iConX] - piSeries[iConY];
-            unsigned int iLeft = iConY + 1;
-            unsigned int iRight = iSize - 1;
-            int iMiddle;
-            while(iRight >= iLeft){
-                iMiddle = (iRight + iLeft) / 2;
-                if(piSeries[iMiddle] == iRequire){
-                    break;
-                }else if(piSeries[iMiddle] < iRequire){
-                    iLeft = iMiddle + 1;
-                }else{
-                    iRight = iMiddle - 1;
-                }
-                iMiddle = -1;
-            }
-            if(iMiddle != -1){
-                struct sResult *pmResult = (struct sResult *)malloc(sizeof(struct sResult));
-                pmResult->piSeries = (int *)malloc(sizeof(int) * 3);
-                pmResult->piSeries[0] = piSeries[iConX];
-                pmResult->piSeries[1] = piSeries[iConY];
-                pmResult->piSeries[2] = piSeries[iMiddle];
-                pmResult->pmNext = pmResults;
-                pmResults = pmResult;
-                iResults++;
-            }
+			if (iRequire <= iMax && iRequire >= piSeries[iConY + 1]) {
+				unsigned int iLeft = iConY + 1;
+				unsigned int iRight = iSize - 1;
+				int iMiddle;
+				while (iRight >= iLeft) {
+					iMiddle = (iRight + iLeft) / 2;
+					if (piSeries[iMiddle] == iRequire) {
+						break;
+					}
+					else if (piSeries[iMiddle] < iRequire) {
+						iLeft = iMiddle + 1;
+					}
+					else {
+						iRight = iMiddle - 1;
+					}
+					iMiddle = -1;
+				}
+				if (iMiddle != -1) {
+					struct sResult *pmResult = (struct sResult *)malloc(sizeof(struct sResult));
+					pmResult->piSeries = (int *)malloc(sizeof(int) * 3);
+					pmResult->piSeries[0] = piSeries[iConX];
+					pmResult->piSeries[1] = piSeries[iConY];
+					pmResult->piSeries[2] = piSeries[iMiddle];
+					pmResult->pmNext = pmResults;
+					pmResults = pmResult;
+					iResults++;
+				}
+			}
         }
     }
     
