@@ -9,49 +9,47 @@ void rPrintS(int *piSeries, unsigned int iSize){
     }
     printf("\n");
 }
+void rPrint(int *piSeries, unsigned int iSize) {
+	unsigned int iCon;
+	for (iCon = 0; iCon < iSize; iCon++) {
+		printf("%d ", piSeries[iCon]);
+	}
+	printf("\n");
+}
 
 void rSort(int *piSeries, unsigned int iSize){
     
-    if(iSize <= 1){return;}
+    int *piL = piSeries;
+    int *piR = piSeries + iSize;
     
-    int *piL = piSeries + 1;
-    int *piR = piSeries + iSize - 1;
-    
-    if(piL == piR){
-        if(*piSeries > *piL){
-            int iTemp = *piL;
-            *piL = *piSeries;
-            *piSeries = iTemp;
-        }
-        return;
-    }
-    
-    while(piL < piR){
-        while(*piSeries <= *piR  && piR > piL){
+	do {
+        do{
             piR--;
-        }
-        while(*piSeries > *piL && piL < piR){
+		} while (*piSeries <= *piR  && piR > piL);
+
+        do{
             piL++;
-        }
-        if(piL != piR){
+		} while (*piSeries > *piL && piL < piR);
+        if(piL < piR){
             int iTemp = *piR;
             *piR = *piL;
             *piL = iTemp;
-        }else{
-            int iTemp = *piSeries;
-            *piSeries = *piL;
-            *piL = iTemp;
         }
-    }
-    rSort(piSeries, (unsigned int)(piR - piSeries) + 1);
-    rSort(piR + 1, iSize - (unsigned int)(piL - piSeries) - 1);
-}
-void rPrint(int *piSeries, unsigned int iSize){
-    unsigned int iCon;
-    for(iCon = 0 ; iCon < iSize ; iCon++){
-        printf("%d ", piSeries[iCon]);
-    }
-    printf("\n");
+	}while (piL < piR);
+	
+	int iTemp = *piSeries;
+	*piSeries = *piR;
+	*piR = iTemp;
+
+	unsigned int iSizeTemp;
+	iSizeTemp = (unsigned int)(piR - piSeries);
+	if (iSizeTemp > 1) {
+		rSort(piSeries, iSizeTemp);
+	}
+	iSizeTemp = iSize -  (unsigned int)(piR - piSeries) - 1;
+	if (iSizeTemp > 1) {
+		rSort(piR + 1, iSizeTemp);
+	}
 }
 int** threeSum(int* piSeries, int iSize, int* piResultRows, int** ppiResultColumns){
     rSort(piSeries, iSize);
