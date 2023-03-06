@@ -65,15 +65,15 @@ void rGenerate(unsigned int iNumber) {
 					pcParentheses = (char *)malloc(sizeof(char) * (iSize));
 					pcParentheses[0] = 0;
 					for (iConChunks = 0; iConChunks < iConNumber; iConChunks++) {
-						strcat_s(pcParentheses, iSize, "(");
+						strcat(pcParentheses, "(");
 						//strcat(pcParentheses, gmMeta.pmCaches[pmChunks[iConChunks].iLeft].ppcParentheses[pmChunks[iConChunks].iAcc]);
-						strcat_s(pcParentheses, iSize, gmMeta.pmCaches[pmChunks[iConChunks].iLeft].ppcParentheses[pmChunks[iConChunks].iAcc]);
-						strcat_s(pcParentheses, iSize, ")");
+						strcat(pcParentheses, gmMeta.pmCaches[pmChunks[iConChunks].iLeft].ppcParentheses[pmChunks[iConChunks].iAcc]);
+						strcat(pcParentheses, ")");
 					}
 					pmResult->ppcParentheeses[iConCombo] = pcParentheses;
 					pmChunks[0].iAcc++;
 					for (iConChunks = 0; iConChunks < iConNumber - 1; iConChunks++) {
-						if (pmChunks[iConChunks].iAcc > pmChunks[iConChunks].iLeft) {
+						if (pmChunks[iConChunks].iAcc >= pmChunks[iConChunks].iLeft) {
 							pmChunks[iConChunks].iAcc = 0;
 							pmChunks[iConChunks + 1].iAcc++;
 						}
