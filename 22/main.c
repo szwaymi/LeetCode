@@ -157,11 +157,15 @@ int main(void){
 	M_TEST_EXP(0, "()");
 	M_TEST_EXP(1, "()()", "(())");
     M_TEST_EXP(2, "((()))","(()())","(())()","()(())","()()()");
+	M_TEST_EXP(3, "(((())))", "((()()))", "(()(()))", "((())())", "(()()())", "()((()))", "()(()())", "(())(())", "((()))()", "(()())()", "()()(())", "()(())()", "(())()()", "()()()())");
+	M_TEST_EXP(4, "");
     //      Test
     struct sTest mTest[]={
 		//M_TEST_COLLECTION(0, 1),
 		//M_TEST_COLLECTION(1, 2),
-        M_TEST_COLLECTION(2, 3),
+        //M_TEST_COLLECTION(2, 3),
+		//M_TEST_COLLECTION(3, 4),
+		M_TEST_COLLECTION(4, 5)
     };
 
    
