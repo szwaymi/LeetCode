@@ -13,7 +13,6 @@ struct {
 }gmMeta;
 
 void rGenerate(unsigned int iNumber) {
-    //printf("%d\n", iNumber);
     int iResults = 0;
     struct sResult {
         unsigned char iNumber;
@@ -23,11 +22,11 @@ void rGenerate(unsigned int iNumber) {
     struct sResult *pmResults = NULL;
     unsigned int iConNumber;
     for (iConNumber = iNumber; iConNumber > 0; iConNumber--) {
-        //printf("(%d:%d)", iNumber, iConNumber);
         unsigned char iLeft = iNumber - iConNumber;
         struct sChunk {
             unsigned char iLeft;
             unsigned char iAcc;
+            unsigned char iComb;
         };
         struct sChunk *pmChunks = (struct sChunk *)malloc(sizeof(struct sChunk) * iConNumber);
         unsigned int iConChunks;
@@ -37,7 +36,6 @@ void rGenerate(unsigned int iNumber) {
         pmChunks[0].iLeft = iLeft - 1;
         do {
             unsigned int iSum = 0;
-            //printf("[");
             pmChunks[0].iLeft++;
             for (iConChunks = 0; iConChunks < iConNumber - 1; iConChunks++) {
                 if (pmChunks[iConChunks].iLeft > iLeft) {
@@ -45,15 +43,9 @@ void rGenerate(unsigned int iNumber) {
                     pmChunks[iConChunks + 1].iLeft++;
                 }
                 iSum += pmChunks[iConChunks].iLeft;
-                //printf("%d.", pmChunks[iConChunks].iLeft);
             }
             iSum += pmChunks[iConChunks].iLeft;
-            //printf("%d.", pmChunks[iConChunks].iLeft);
-            //printf("]");
             if (iSum == iLeft) {
-                if(iLeft == 2){
-                    printf("A");
-                }
                 unsigned int iCombinations = 1;
                 for (iConChunks = 0; iConChunks < iConNumber; iConChunks++) {
                     if (gmMeta.pmCaches[pmChunks[iConChunks].iLeft].iCombinations == 0xFFFFFFFF){
@@ -61,6 +53,7 @@ void rGenerate(unsigned int iNumber) {
                     }
                     iCombinations *= gmMeta.pmCaches[pmChunks[iConChunks].iLeft].iCombinations;
                     pmChunks[iConChunks].iAcc = 0;
+                    pmChunks[iConChunks].iComb = gmMeta.pmCaches[pmChunks[iConChunks].iLeft].iCombinations;
                 }
                 
                 struct sResult *pmResult = (struct sResult *)malloc(sizeof(struct sResult));
@@ -70,41 +63,29 @@ void rGenerate(unsigned int iNumber) {
                 pmResult->ppcParentheeses = (char **)malloc(sizeof(char *) * iCombinations);
                 unsigned int iConCombo;
                 for (iConCombo = 0; iConCombo < iCombinations; iConCombo++) {
-                    printf("^A<");
                     for(iConChunks = 0 ; iConChunks < iConNumber ; iConChunks++){
-                        printf("%d,%d ",pmChunks[iConChunks].iLeft, pmChunks[iConChunks].iAcc);
-                        if(pmChunks[iConChunks].iLeft==2 && pmChunks[iConChunks].iAcc==0)
-                        {
-                            printf("Q");
-                        }
                     }
-                    printf(">");
                     char *pcParentheses;
                     unsigned int iSize = iLeft * 2 + iConNumber * 2 + 1;
                     pcParentheses = (char *)malloc(sizeof(char) * (iSize));
                     pcParentheses[0] = 0;
-                    //printf("^B(%d,%d)",iSize, iConNumber);
                     for (iConChunks = 0; iConChunks < iConNumber; iConChunks++) {
-                        //printf("#%d.%d",pmChunks[iConChunks].iLeft,pmChunks[iConChunks].iAcc);
-                        //printf("[$%d.%d]", strlen(gmMeta.pmCaches[pmChunks[iConChunks].iLeft].ppcParentheses[pmChunks[iConChunks].iAcc]),pmChunks[iConChunks].iLeft);
                         strcat(pcParentheses, "(");
                         strcat(pcParentheses, gmMeta.pmCaches[pmChunks[iConChunks].iLeft].ppcParentheses[pmChunks[iConChunks].iAcc]);
                         strcat(pcParentheses, ")");
-                        printf("%s\n", pcParentheses);
                     }
                     pmResult->ppcParentheeses[iConCombo] = pcParentheses;
-                    unsigned char iCarry = 1;
+                    pmChunks[0].iAcc++;
                     for (iConChunks = 0; iConChunks < iConNumber - 1; iConChunks++) {
-                        if(pmChunks[iConChunks].iLeft){
-                            pmChunks[iConChunks].iAcc += iCarry;
-                            if (pmChunks[iConChunks].iAcc >= pmChunks[iConChunks].iLeft) {
-                                pmChunks[iConChunks].iAcc = 0;
-                                iCarry = 1;
-                            }else{
-                                iCarry = 0;
-                                break;
-                            }
+                        if (pmChunks[iConChunks].iAcc >= pmChunks[iConChunks].iComb) {
+                            pmChunks[iConChunks].iAcc = 0;
+                            pmChunks[iConChunks + 1].iAcc++;
+                        }else{
+                            break;
                         }
+                    }
+                    if (pmChunks[iConChunks].iAcc >= pmChunks[iConChunks].iComb) {
+                        pmChunks[iConChunks].iAcc = 0;
                     }
                     iResults++;
                 }
@@ -146,7 +127,7 @@ char ** generateParenthesis(int iNumber, int* piResults){
     }
 
     rGenerate(iNumber);
-    printf("H");
+
 
     for (iCon = 1; iCon < iNumber - 1; iCon++) {
         unsigned int iConC;
@@ -187,14 +168,14 @@ int main(void){
 	M_TEST_EXP(0, "()");
 	M_TEST_EXP(1, "()()", "(())");
     M_TEST_EXP(2, "((()))","(()())","(())()","()(())","()()()");
-	M_TEST_EXP(3, "(((())))", "((()()))", "(()(()))", "((())())", "(()()())", "()((()))", "()(()())", "(())(())", "((()))()", "(()())()", "()()(())", "()(())()", "(())()()", "()()()())");
+	M_TEST_EXP(3, "(((())))", "((()()))", "(()(()))", "((())())", "(()()())", "()((()))", "()(()())", "(())(())", "((()))()", "(()())()", "()()(())", "()(())()", "(())()()", "()()()()");
 	M_TEST_EXP(4, "");
     //      Test
     struct sTest mTest[]={
 		//M_TEST_COLLECTION(0, 1),
 		//M_TEST_COLLECTION(1, 2),
-        M_TEST_COLLECTION(2, 3),
-		//M_TEST_COLLECTION(3, 4),
+        //M_TEST_COLLECTION(2, 3),
+		M_TEST_COLLECTION(3, 4),
 		//M_TEST_COLLECTION(4, 5)
     };
 
