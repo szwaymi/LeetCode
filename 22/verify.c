@@ -15,40 +15,44 @@ static struct {
 	unsigned int iResults;
 	unsigned int iNumber;
 	struct sResult *pmResults;
+	char *pcParentheses;
 }gmMeta;
 
-static void rVRF_Generate(unsigned char iLeft, unsigned char iRight, char *pcParent) {
+static void rVRF_Generate(unsigned char iLeft, unsigned char iRight, char *pcParentheses) {
 
 	if (gmMeta.iNumber == iLeft && iLeft == iRight) {
+		*pcParentheses = 0;
 		struct sResult *pmResult = (struct sResult *)malloc(sizeof(struct sResult));
 		pmResult->pmNext = gmMeta.pmResults;
 		gmMeta.pmResults = pmResult;
 
 		pmResult->pcParentheses = (char *)malloc(sizeof(char) * (gmMeta.iNumber * 2 + 1));
-		strcpy(pmResult->pcParentheses, pcParent);
+		strcpy(pmResult->pcParentheses, gmMeta.pcParentheses);
 
 		gmMeta.iResults++;
 		return;
 	}
-	char *pcParentheses = (char *)malloc(sizeof(char) * (iRight + iLeft + 2));
+	char *pcTemp;
+	pcTemp = pcParentheses;
 	if (iLeft < gmMeta.iNumber) {
-		strcpy(pcParentheses, pcParent);
-		strcat(pcParentheses, "(");
-		rVRF_Generate(iLeft + 1, iRight, pcParentheses);
+		*pcTemp = '(';
+		pcTemp++;
+		rVRF_Generate(iLeft + 1, iRight, pcTemp);
 	}
+	pcTemp = pcParentheses;
 	if (iLeft > iRight) {
-		strcpy(pcParentheses, pcParent);
-		strcat(pcParentheses, ")");
-		rVRF_Generate(iLeft, iRight + 1, pcParentheses);
+		*pcTemp = ')';
+		pcTemp++;
+		rVRF_Generate(iLeft, iRight + 1, pcTemp);
 	}
-	free(pcParentheses);
 }
 char ** rVRF_GenerateParenthesis(int iNumber, int* piResults) {
-	char *pcTemp = { "" };
+	gmMeta.pcParentheses = (char *)malloc(sizeof(char) * (iNumber * 2 + 1));;
+	gmMeta.pcParentheses[0] = 0;
 	gmMeta.iNumber = iNumber;
 	gmMeta.pmResults = NULL;
 	gmMeta.iResults = 0;
-	rVRF_Generate(0, 0, pcTemp);
+	rVRF_Generate(0, 0, gmMeta.pcParentheses);
 	*piResults = gmMeta.iResults;
 	char **ppcResults = (char **)malloc(sizeof(char *) * gmMeta.iResults);
 	struct sResult *pmResult;
