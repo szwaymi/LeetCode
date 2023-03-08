@@ -1,8 +1,24 @@
 
 #include <stdio.h>
 
-int* searchRange(int* piSeries, int iSize, int iTarget, int* piResults){
+struct{
+    int iLocation[2];
+    int *piSeries;
+    int iTarget;
+}gmMeta;
 
+void rSearch(unsigned int iLeft, unsigned int iRight){
+    int iMiddle = (iLeft + iRight) / 2;
+    
+}
+
+int* searchRange(int* piSeries, int iSize, int iTarget, int* piResults){
+    gmMeta.iLocation[0] = 0;
+    gmMeta.iLocation[1] = iSize - 1;
+    gmMeta.piSeries = piSeries;
+    gmMeta.iTarget = iTarget;
+    rSearch(0, iSize - 1);
+    return gmMeta.iLocation;
 }
 int main(void){
         
