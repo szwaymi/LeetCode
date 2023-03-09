@@ -9,12 +9,31 @@ struct{
 
 void rSearch(unsigned int iLeft, unsigned int iRight){
     int iMiddle = (iLeft + iRight) / 2;
-    
+    if(gmMeta.piSeries[iLeft] <= gmMeta.iTarget && gmMeta.piSeries[iMiddle] >= gmMeta.iTarget){
+        if(gmMeta.piSeries[iRight] == gmMeta.iTarget && iRight > gmMeta.iLocation[1]){
+            gmMeta.iLocation[1] = iRight;
+        }
+        if(gmMeta.piSeries[iLeft] == gmMeta.iTarget && iLeft < gmMeta.iLocation[1]){
+            gmMeta.iLocation[0] = iLeft;
+        }
+        rSearch(iLeft, iMiddle);
+    }
+    if(gmMeta.piSeries[iMiddle+1] <= gmMeta.iTarget && gmMeta.piSeries[iRight] >= gmMeta.iTarget){
+        if(gmMeta.piSeries[iRight] == gmMeta.iTarget && iRight > gmMeta.iLocation[1]){
+            gmMeta.iLocation[1] = iRight;
+        }
+        if(gmMeta.piSeries[iMiddle + 1] == gmMeta.iTarget && iMiddle + 1 < gmMeta.iLocation[0]){
+            gmMeta.iLocation[0] = iLeft;
+        }
+        if(iMiddle + 1 < iRight){
+            rSearch(iMiddle + 1, iRight);
+        }
+    }
 }
 
 int* searchRange(int* piSeries, int iSize, int iTarget, int* piResults){
-    gmMeta.iLocation[0] = 0;
-    gmMeta.iLocation[1] = iSize - 1;
+    gmMeta.iLocation[0] = iSize;
+    gmMeta.iLocation[1] = -1;
     gmMeta.piSeries = piSeries;
     gmMeta.iTarget = iTarget;
     rSearch(0, iSize - 1);
