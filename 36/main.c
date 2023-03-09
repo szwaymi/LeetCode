@@ -23,7 +23,6 @@ bool isValidSudoku(char** pcBoard, int iRows, int* piCols){
                 iTotal |= iMask;
             }
         }
-        printf("\n");
     }
     for(iConX = 0 ; iConX < 9 ; iConX++){
         iTotal = 0;
@@ -128,7 +127,6 @@ int main(void) {
 	unsigned int iConTest;
 
 	for (iConTest = 0; iConTest < iLengthTest; iConTest++) {
-        if(mTest[iConTest].iNO == 490){
             printf("Test Case [%d]: ", mTest[iConTest].iNO);
             char **ppcBoard = (char **)malloc(sizeof(char *) * 9);
             int *piCols = (int *)malloc(sizeof(int) * 9);
@@ -141,7 +139,6 @@ int main(void) {
             printf("%d\n", bResult);
             free(piCols);
             free(ppcBoard);
-        }
 	}
     return 0;
 
