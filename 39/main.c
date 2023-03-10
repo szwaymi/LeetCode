@@ -1,10 +1,55 @@
 
+#include <stdlib.h>
 #include <stdio.h>
 
 int** combinationSum(int* piCandidates, int iLength, int iTarget, int* piResults, int** ppiLength){
     
-    unsigned int iNumber = (iTarget + piCandidates[0] - 1) / piCandidates[0];
-    printf("%d", iNumber);
+    unsigned int iNumber = iTarget / piCandidates[0];
+    unsigned char *piAccs = (unsigned char *)malloc(sizeof(unsigned char) * (iNumber + 1));
+    {
+        unsigned int iCon;
+        for(iCon = 0 ; iCon < iNumber + 1 ; iCon++){
+            piAccs[iCon] = 0;
+        }
+    }
+    unsigned int iConNumber;
+    for(iConNumber = 0 ; iConNumber < iNumber ; iConNumber++){
+        do{
+            unsigned int iConCombine;
+            int iSum = 0;
+            for(iConCombine = 0 ; iConCombine < iConNumber ; iConCombine++){
+                iSum += piCandidates[piAccs[iConNumber]];
+                if(iSum > iTarget){
+                    break;
+                }
+            }
+            if(iSum == iTarget && iConCombine == iConNumber){
+                unsigned int iConDbg;
+                for(iConDbg = 0 ; iConDbg <= iConNumber ; iConDbg++){
+                    printf("%d ", piCandidates[piAccs[iConDbg]]);
+                }
+                printf("\n");
+                for(iConDbg = 0 ; iConDbg <= iNumber ; iConDbg++){
+                    printf("%d ", piAccs[iConDbg]);
+                }
+                printf("\n");
+            }
+            piAccs[0]++;
+            for(iConCombine = 0 ; iConCombine < iConNumber ; iConCombine++){
+                if(piAccs[iConCombine] >= iLength){
+                    piAccs[iConCombine] = 0;
+                    piAccs[iConCombine + 1]++;
+                }else{
+                    unsigned int iConBit;
+                    for(iConBit = 0 ; iConBit < iConCombine ; iConBit++){
+                        piAccs[iConNumber - 2 -iConBit] = piAccs[iConCombine];
+                    }
+                    break;
+                }
+            }
+        }while(piAccs[iConNumber] == 0);
+    }
+    
     
     return NULL;
 }
