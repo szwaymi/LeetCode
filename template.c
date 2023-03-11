@@ -15,6 +15,9 @@ int main(void){
     struct sExp{
     };
     struct sTest{
+        unsigned int iNO;
+        struct sInput mInput;
+        struct sExp mExp;
     };
     //  Data
     struct sTest mTest[]={
