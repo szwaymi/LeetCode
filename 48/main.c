@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 void rotate(int** ppiMatrix, int iSize, int* piCols){
-    printf("\n");
     int iLocX;
     int iLocY;
     unsigned int iConZ;
@@ -55,10 +54,21 @@ void rotate(int** ppiMatrix, int iSize, int* piCols){
         }
     }
 }
-
+void rShowMatrix(int **ppiMatrix, unsigned int iDimension, unsigned int iTab){
+    unsigned int iConX;
+    unsigned int iConY;
+    unsigned int iConTab;
+    for(iConY = 0 ; iConY < iDimension ; iConY++){
+        for(iConTab = 0 ; iConTab < iTab ; iConTab++){printf(" ");}
+        for(iConX = 0 ; iConX < iDimension ; iConX++){
+            printf("%2d ", ppiMatrix[iConY][iConX]);
+        }
+        printf("\n");
+    }
+}
 int main(void){
     //Test Data
-    //  Macro [1,2,3],[4,5,6],[7,8,9]
+    //  Macro
 #define M_TEST_INPUT(N, D, ...) int iSeries_##N[][D] = { __VA_ARGS__ };int *piSeries_##N[D];int iCols_##N[D];for(unsigned int iCon = 0 ; iCon < D ; iCon++){piSeries_##N[iCon] = iSeries_##N[iCon];iCols_##N[iCon] = D;}
 #define M_TEST_EXP(N, ...) int iExp_##N[][sizeof(iSeries_##N) / sizeof(iSeries_##N[0])] = { __VA_ARGS__ };int *piExp_##N[sizeof(iSeries_##N) / sizeof(iSeries_##N[0])];for(unsigned int iCon = 0 ; iCon < sizeof(iSeries_##N) / sizeof(iSeries_##N[0]) ; iCon++){piExp_##N[iCon] = iExp_##N[iCon];}
 #define M_TEST_COLLECTION(N) {N, {piSeries_##N, sizeof(iSeries_##N) / sizeof(iSeries_##N[0]), iCols_##N},{piExp_##N}}
@@ -89,13 +99,14 @@ int main(void){
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
     for(iConTest = 0 ; iConTest < iLengthTest ; iConTest++){
-        printf("Test Case [%d], ", mTest[iConTest].iNO);
+        printf("Test Case [%d]\n", mTest[iConTest].iNO);
         //Expectaion
-        printf("Expecation = ");
-        
+        printf("  Expecation:\n");
+        rShowMatrix(mTest[iConTest].mExp.piMatrix, mTest[iConTest].mInput.iSize, 4);
         //Result
-        printf("Result = ");
+        printf("  Result:\n");
         rotate(mTest[iConTest].mInput.piMatrix, mTest[iConTest].mInput.iSize, mTest[iConTest].mInput.piCols);
+        rShowMatrix(mTest[iConTest].mInput.piMatrix, mTest[iConTest].mInput.iSize, 4);
         //Comparison
         int iTest = 1;
         {
