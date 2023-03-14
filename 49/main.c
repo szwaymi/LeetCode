@@ -157,16 +157,23 @@ char *** groupAnagrams(char ** ppcStrs, int iLength, int *piGroups, int** ppiGro
 		unsigned int iConLength;
 		for (iConLength = 0; iConLength < piGroupLengthes[iConGroups]; iConLength++) {
 			pppcGroups[iConGroups][iConLength] = ppcStrs[pmEvaluations[iLoc].iID];
+            struct sRating *pmRating;
+            while(pmEvaluations[iLoc].mRatings.pmNext){
+                pmRating = pmEvaluations[iLoc].mRatings.pmNext;
+                pmEvaluations[iLoc].mRatings.pmNext = pmRating->pmNext;
+                free(pmRating);
+            }
+            free(pmEvaluations[iLoc].mRatings.pmNext);
 			iLoc++;
 		}
 	}
 
+    free(pmEvaluations);
+    
 	*piGroups = iGroups;
 	*ppiGroupLengthes = piGroupLengthes;
 
 	return pppcGroups;
-	
-	//return NULL;
 }
 
 int main(void){
