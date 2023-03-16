@@ -11,37 +11,44 @@ int maxSubArray(int* piSeries, int iLength) {
 
 	int iLeft = 0;
 	int iRight = iLength - 1;
-
-	int iMin;
 	int iCon;
+	int iMax;
 	int iSum;
 
-	iMin = 0x7FFFFFFF;
 	iSum = 0;
+	iMax = 0x80000000;
 	for (iCon = 0; iCon < iLength; iCon++) {
 		iSum += piSeries[iCon];
-		if (iSum < iMin) {
-			iMin = iSum;
-			iLeft = iCon + 1;
+		if (iSum > iMax) {
+			iMax = iSum;
+			iRight = iCon;
 		}
 	}
-	if (iLeft == iLength - 1) { return piSeries[iLeft]; }
 
-	iMin = 0x7FFFFFFF;
 	iSum = 0;
-	for (iCon = iLength; iCon > 0; iCon--) {
-		iSum += piSeries[iCon - 1];
-		if (iSum < iMin) {
-			iMin = iSum;
-			iRight = iCon - 2;
+	iMax = 0x80000000;
+	for (iCon = 0; iCon < iLength; iCon++) {
+		iSum += piSeries[iLength - 1 - iCon];
+		if (iSum > iMax) {
+			iMax = iSum;
+			iLeft = iLength - 1 - iCon;
 		}
 	}
-
 	printf("%d %d\n", iLeft, iRight);
 
-	iSum = 0;
-	for (iCon = iLeft; iCon <= iRight; iCon++) {
-		iSum += piSeries[iCon];
+	if (iRight < iLeft) {
+		iSum = 0x80000000;
+		for (iCon = 0; iCon < iLength; iCon++) {
+			if (piSeries[iCon] > iSum) {
+				iSum = piSeries[iCon];
+			}
+		}
+	}
+	else {
+		iSum = 0;
+		for (iCon = iLeft; iCon <= iRight; iCon++) {
+			iSum += piSeries[iCon];
+		}
 	}
 	return iSum;
 }
@@ -73,20 +80,20 @@ int main(void){
 	M_TEST_INPUT(134, -1, -2);
 	M_TEST_INPUT(140, -1);
 	M_TEST_INPUT(154, -2, -1);
+	M_TEST_INPUT(184, 1, 2, -1, -2, 2, 1, -2, 1);
 	M_TEST_INPUT(1024, -10, -1, -1, 1, 2, 3);
 	M_TEST_INPUT(1025, -100, -2, 1, 1, 1, 1,-300);
 	struct sTest mTest[] = {
-		/*
-		M_TEST_COLLECTION(1, 6),
-		M_TEST_COLLECTION(2, 1),
-		M_TEST_COLLECTION(3, 23),
-		M_TEST_COLLECTION(129, 1),
-		M_TEST_COLLECTION(134, -1),
-		M_TEST_COLLECTION(140, -1),
-		M_TEST_COLLECTION(154, -1),
-		M_TEST_COLLECTION(1024, 6),
-		*/
-		M_TEST_COLLECTION(1025, 1),
+		//M_TEST_COLLECTION(1, 6),
+		//M_TEST_COLLECTION(2, 1),
+		//M_TEST_COLLECTION(3, 23),
+		//M_TEST_COLLECTION(129, 1),
+		//M_TEST_COLLECTION(134, -1),
+		//M_TEST_COLLECTION(140, -1),
+		//M_TEST_COLLECTION(154, -1),
+		M_TEST_COLLECTION(184, 3),
+		//M_TEST_COLLECTION(1024, 6),
+		//M_TEST_COLLECTION(1025, 4),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
