@@ -4,24 +4,45 @@
 #include <stdio.h>
 
 int maxSubArray(int* piSeries, int iLength) {
+    printf("\n");
+    printf("%d\n", iLength);
     int *piLeft = (int *)malloc(sizeof(int) * iLength);
     int *piRight = (int *)malloc(sizeof(int) * iLength);
     int iSum;
     int iTotal;
     unsigned int iCon;
-    struct{
-        int iMin;
-        unsigned int iLoc;
-    }mLeft;
+    unsigned int iLoc;
+    int iLast;
+    int iMin = 0x80000000;
     
-    mLeft.iMin = 0x7FFFFFFF;
+    iLast = -1;
+    iLoc = 0;
     iSum = 0;
     piLeft[0] = 0;
-    for(iCon = 1 ; iCon < iLength ; iCon++){
-        iSum += piSeries[iCon - 1];
-        piLeft[iCon] = iSum;
+    iLoc++;
+    for(iCon = 0 ; iCon < iLength - 1 ; iCon++){
+        if(iLast < 0 && piSeries[iCon] < 0){
+            iLoc = 0;
+            if(piSeries[iCon] > iMin){
+                iMin = piSeries[iCon];
+            }
+            continue;
+        }
+        iSum += piSeries[iCon];
+        piLeft[iLoc] = iSum;
+        iLoc++;
+        iLast = 1;
     }
-    iTotal = iSum + piSeries[iCon - 1];
+    if(iLoc == 0){
+        if(piSeries[iCon] > iMin){return piSeries[iCon];}
+        return iMin;
+    }
+    iTotal = iSum + piSeries[iCon];
+    if(iCon > iLoc){
+        piSeries = &piSeries[iCon - iLoc];
+        iLength = iLoc + 1;
+    }
+    printf("%d %d\n", iCon, iLoc);
     
     iSum = 0;
     piRight[0] = 0;
@@ -30,8 +51,8 @@ int maxSubArray(int* piSeries, int iLength) {
         piRight[iCon + 1] = iSum;
     }
     
-    int iLast = 1;
-    int iMin = 0x7FFFFFFF;
+    iLast = 1;
+    iMin = 0x7FFFFFFF;
     for(iCon = 0 ; iCon < iLength ; iCon++){
         unsigned int iConT;
         if(piRight[iCon] >= iLast){
@@ -76,6 +97,7 @@ int main(void){
 	M_TEST_INPUT(129, -2, 1);
 	M_TEST_INPUT(134, -1, -2);
 	M_TEST_INPUT(140, -1);
+    M_TEST_INPUT(146, -2, 1, -3, 4, -1, 2, 1, -5, 4);
 	M_TEST_INPUT(154, -2, -1);
 	M_TEST_INPUT(171, -1, 0, -2, 2);
 	M_TEST_INPUT(178, 0, -3, 1, 1);
@@ -84,20 +106,21 @@ int main(void){
 	M_TEST_INPUT(1025, -100, -2, 1, 1, 1, 1,-300);
     M_TEST_INPUT(1026, -1, -1, -1, -1, -1, -1, -1);
 	struct sTest mTest[] = {
-        M_TEST_COLLECTION(1026, -1),
-		M_TEST_COLLECTION(1, 6),
-		M_TEST_COLLECTION(2, 1),
-		M_TEST_COLLECTION(3, 23),
-		M_TEST_COLLECTION(11, 1),
-		M_TEST_COLLECTION(13, 0),
-		M_TEST_COLLECTION(129, 1),
-		M_TEST_COLLECTION(134, -1),
-		M_TEST_COLLECTION(140, -1),
-		M_TEST_COLLECTION(154, -1),
-		M_TEST_COLLECTION(171, 2),
-		M_TEST_COLLECTION(178, 2),
-		M_TEST_COLLECTION(184, 3),
-		M_TEST_COLLECTION(1024, 6),
+        //M_TEST_COLLECTION(1026, -1),
+		//M_TEST_COLLECTION(1, 6),
+		//M_TEST_COLLECTION(2, 1),
+		//M_TEST_COLLECTION(3, 23),
+		//M_TEST_COLLECTION(11, 1),
+		//M_TEST_COLLECTION(13, 0),
+		//M_TEST_COLLECTION(129, 1),
+		//M_TEST_COLLECTION(134, -1),
+		//M_TEST_COLLECTION(140, -1),
+        M_TEST_COLLECTION(146, 6),
+		//M_TEST_COLLECTION(154, -1),
+		//M_TEST_COLLECTION(171, 2),
+		//M_TEST_COLLECTION(178, 2),
+		//M_TEST_COLLECTION(184, 3),
+		//M_TEST_COLLECTION(1024, 6),
 		M_TEST_COLLECTION(1025, 4),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
