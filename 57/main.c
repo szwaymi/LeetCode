@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int** insert(int** ppIntervals, int iLength, int* piCols, int* piNew, int iLenNew, int *piLength, int** ppiCols){
+int** insert(int** ppiIntervals, int iLength, int* piCols, int* piNew, int iLenNew, int *piLength, int** ppiCols){
 
     struct sResult{
         int *piInterval;
@@ -18,34 +18,16 @@ int** insert(int** ppIntervals, int iLength, int* piCols, int* piNew, int iLenNe
     int iResults = 0;
     
     ppmResult = &pmResults;
+    int *piLast = piNew;
+    
     while(iCon < iLength){
-        pmResult = (struct sResult *)malloc(sizeof(struct sResult));
-        *ppmResult = pmResult;
-        ppmResult = &pmResult->pmNext;
-        pmResult->piInterval = ppIntervals[iCon];
-        iResults++;
-        if(piNew[0] <= pmResult->piInterval[1] && piNew[0] >= pmResult->piInterval[0]){
-            if(pmResult->piInterval[1] < piNew[1]){
-                pmResult->piInterval[1] = piNew[1];
-            }
-            
-            while(iCon + 1 < iLength && ppIntervals[iCon+1][0] <= pmResult->piInterval[1]){
-                if(pmResult->piInterval[1] < ppIntervals[iCon + 1][1]){
-                    pmResult->piInterval[1] = ppIntervals[iCon+1][1];
-                }
-                iCon++;
-            }
+        if(piLast[0] < ppiIntervals[iCon][0]){
             
         }
+
         iCon++;
     }
-    if(pmResult){
-        pmResult->pmNext = NULL;
-    }else{
-        pmResults = (struct sResult *)malloc(sizeof(struct sResult));
-        pmResults->piInterval = piNew;
-        iResults++;
-    }
+    
     
     int **ppiResults = (int **)malloc(sizeof(int *) * iResults);
     piCols = (int *)malloc(sizeof(int) * iResults);
