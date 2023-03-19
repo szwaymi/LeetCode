@@ -9,14 +9,15 @@ int** insert(int** ppIntervals, int iLength, int* piCols, int* piNew, int iLenNe
         int *piInterval;
         struct sResult *pmNext;
     };
+    
+    //int iIntervals[2];
     struct sResult *pmResults;
     struct sResult **ppmResult;
     struct sResult *pmResult = NULL;
-    ppmResult = &pmResults;
-    
+    unsigned int iCon = 0;
     int iResults = 0;
     
-    unsigned int iCon = 0;
+    ppmResult = &pmResults;
     while(iCon < iLength){
         pmResult = (struct sResult *)malloc(sizeof(struct sResult));
         *ppmResult = pmResult;
@@ -27,17 +28,23 @@ int** insert(int** ppIntervals, int iLength, int* piCols, int* piNew, int iLenNe
             if(pmResult->piInterval[1] < piNew[1]){
                 pmResult->piInterval[1] = piNew[1];
             }
-            if(iCon + 1 < iLength){
-                if(ppIntervals[iCon+1][0] < pmResult->piInterval[1]){
+            
+            while(iCon + 1 < iLength && ppIntervals[iCon+1][0] <= pmResult->piInterval[1]){
+                if(pmResult->piInterval[1] < ppIntervals[iCon + 1][1]){
                     pmResult->piInterval[1] = ppIntervals[iCon+1][1];
-                    iCon++;
                 }
+                iCon++;
             }
+            
         }
         iCon++;
     }
     if(pmResult){
         pmResult->pmNext = NULL;
+    }else{
+        pmResults = (struct sResult *)malloc(sizeof(struct sResult));
+        pmResults->piInterval = piNew;
+        iResults++;
     }
     
     int **ppiResults = (int **)malloc(sizeof(int *) * iResults);
@@ -89,11 +96,19 @@ int main(void){
     //      #2
     M_TEST_INPUT(2, 4, 8, {1, 2}, {3, 5}, {6, 7}, {8, 10}, {12, 16});
     M_TEST_EXP(2, {1, 2}, {3, 10}, {12, 16});
+    //      #98
+    M_TEST_INPUT(98, 5, 7);
+    M_TEST_EXP(98, {5, 7});
+    //      #1024
+    M_TEST_INPUT(1024, 3, 9, {1, 2}, {6, 8});
+    M_TEST_EXP(1024, {1, 2},{3, 9});
     struct sTest mTest[]={
-        M_TEST_COLLECTION(1),
-        M_TEST_COLLECTION(2),
+        //M_TEST_COLLECTION(1),
+        //M_TEST_COLLECTION(2),
+        //M_TEST_COLLECTION(98),
         //M_TEST_COLLECTION(18),
         //M_TEST_COLLECTION(53),
+        M_TEST_COLLECTION(1024),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
