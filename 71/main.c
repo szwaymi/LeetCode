@@ -1,0 +1,61 @@
+
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+char * simplifyPath(char * path){
+    return NULL;
+}
+int main(void){
+    //Test Data
+    //  Macro
+#define M_TEST_INPUT
+#define M_TEST_EXP
+#define M_TEST_COLLECTION(N, S, E) {N, {S}, {E}}
+    //  Structure
+    struct sInput{
+        char *pcPath;
+    };
+    struct sExp{
+        char *pcPath;
+    };
+    struct sTest{
+        unsigned int iNO;
+        struct sInput mInput;
+        struct sExp mExp;
+    };
+    //  Data
+    struct sTest mTest[]={
+        M_TEST_COLLECTION(1, "/home/", "/home"),
+        M_TEST_COLLECTION(2, "/../", "/"),
+    };
+    unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
+    unsigned int iConTest;
+    for(iConTest = 0 ; iConTest < iLengthTest ; iConTest++){
+        printf("Test Case [%d], ", mTest[iConTest].iNO);
+        //Expectaion
+        printf("Expecation = %s, ",mTest[iConTest].mExp.pcPath);
+        //Result
+        char *pcResult =
+            simplifyPath(mTest[iConTest].mInput.pcPath);
+        printf("Result = %s", pcResult);
+        //Comparison
+        int iTest = strcmp(pcResult, mTest[iConTest].mExp.pcPath);
+        if(iTest == 0){
+            printf("[PASS]");
+        }else{
+            printf("[FAIL]");
+        }
+        printf("\n");
+        if(!iTest){
+            break;
+        }
+    }
+    printf("All Test Case : ");
+    if(iConTest < iLengthTest){
+        printf("[FAIL]");
+    }else{
+        printf("[PASS]");
+    }
+    printf("\n");
+}
