@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 char * simplifyPath(char * path){
+    
     return NULL;
 }
 int main(void){
@@ -28,6 +29,7 @@ int main(void){
     struct sTest mTest[]={
         M_TEST_COLLECTION(1, "/home/", "/home"),
         M_TEST_COLLECTION(2, "/../", "/"),
+        M_TEST_COLLECTION(3, "/home//foo/", "/home/foo/"),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
