@@ -11,6 +11,35 @@ struct ListNode* rotateRight(struct ListNode* pmHead, int iRotates){
     if(pmHead == NULL || iRotates == 0){
         return pmHead;
     }
+	unsigned int iLength = 0;
+	struct ListNode *pmCheck = pmHead;
+	while (pmCheck->next) {
+		pmCheck = pmCheck->next;
+		iLength++;
+	}
+	iLength++;
+	pmCheck->next = pmHead;
+	printf("%d ", iLength);
+	//Tail
+	struct ListNode *pmResult = pmHead;
+	unsigned int iTail = ((iLength - 1) + (iLength - 1) * iRotates) % iLength;
+	unsigned int iHead = (iLength - 1) * iRotates % iLength;
+	printf("%d %d\n", iHead, iTail);
+	pmCheck = pmHead;
+	unsigned int iCon;
+	for (iCon = 0; iCon < iLength; iCon++) {
+		struct ListNode *pmNext = pmCheck->next;
+		if (iCon == iHead) {
+			pmResult = pmCheck;
+		}
+		if (iCon == iTail) {
+			pmCheck->next = NULL;
+		}
+		pmCheck = pmNext;
+	}
+	return pmResult;
+
+	/*
     unsigned int iLen = iRotates + 1;
     struct ListNode **ppmNodes = (struct ListNode **)malloc(sizeof(struct ListNode *) * iLen);
     unsigned int iLoc = 0;
@@ -30,7 +59,9 @@ struct ListNode* rotateRight(struct ListNode* pmHead, int iRotates){
     }
     ppmNodes[(iLoc + iLen - 1) % iLen]->next = pmHead;
     ppmNodes[iLoc]->next = NULL;
-    return ppmNodes[(iLoc + 1) % iLen];
+	*/
+    //return ppmNodes[(iLoc + 1) % iLen];
+	return NULL;
 }
 
 int main(void){
@@ -56,18 +87,22 @@ int main(void){
     };
     //  Data
     //      #1
-    M_TEST_INPUT(1, 1,2,3,4,5);
-    M_TEST_EXP(1, 4,5,1,2,3);
+	M_TEST_INPUT(1, 1, 2, 3, 4, 5);
+	M_TEST_EXP(1, 4, 5, 1, 2, 3);
     //      #2
     M_TEST_INPUT(2, 0, 1, 2);
     M_TEST_EXP(2, 2, 0, 1);
     //      #6
     M_TEST_INPUT(6, 1);
     M_TEST_EXP(6, 1);
+	//		#1024
+	M_TEST_INPUT(1024, 1, 2, 3);
+	M_TEST_EXP(1024, 3, 2, 1);
     struct sTest mTest[]={
         //M_TEST_COLLECTION(1, 2),
         //M_TEST_COLLECTION(2, 4),
-        M_TEST_COLLECTION(6, 1),
+        //M_TEST_COLLECTION(6, 1),
+		M_TEST_COLLECTION(1024,20),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
