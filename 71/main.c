@@ -3,11 +3,35 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-char * simplifyPath(char * path){
+char * simplifyPath(char * pcIn){
     
-    return NULL;
+    char *pcResult = (char *)malloc(sizeof(char) * (strlen(pcIn) + 1));
+    char *pcOut = pcResult;
+    while(*pcIn){
+        if(*pcIn == '.'){
+            pcIn++;
+            if(*pcIn == '.'){
+                if(pcOut > pcResult + 1){
+                    pcOut -= 2;
+                    while(*pcOut != '/'){
+                        pcOut--;
+                    }
+                    pcOut++;
+                }
+            }
+            pcIn+=2;
+        }else{
+            *pcOut = *pcIn;
+            pcOut++;
+            pcIn++;
+        }
+    }
+    *pcOut = 0;
+    
+    return pcResult;
 }
 int main(void){
+    
     //Test Data
     //  Macro
 #define M_TEST_INPUT
@@ -40,7 +64,7 @@ int main(void){
         //Result
         char *pcResult =
             simplifyPath(mTest[iConTest].mInput.pcPath);
-        printf("Result = %s", pcResult);
+        printf("Result = %s ", pcResult);
         //Comparison
         int iTest = strcmp(pcResult, mTest[iConTest].mExp.pcPath);
         if(iTest == 0){
@@ -49,7 +73,7 @@ int main(void){
             printf("[FAIL]");
         }
         printf("\n");
-        if(!iTest){
+        if(iTest){
             break;
         }
     }
