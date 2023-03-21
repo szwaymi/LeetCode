@@ -22,7 +22,6 @@ int rVRF_uniquePaths(int iM, int iN) {
 }
 static struct {
 	int **piCaches;
-	int iM;
 	int iN;
 }gmMeta;
 int rProduce(int iM, int iN) {
@@ -44,22 +43,25 @@ int rProduce(int iM, int iN) {
 	return iSum;
 }
 int uniquePaths(int iM, int iN) {
+	if (iN == 1) {
+		return 1;
+	}
 	gmMeta.iN = iN;
 	unsigned int iCon;
 	gmMeta.piCaches = (int **)malloc(sizeof(int *) * (iM + 1));
 	for (iCon = 0; iCon < (iM + 1); iCon++) {
-		gmMeta.piCaches[iCon] = (int *)malloc(sizeof(int) * (iN + 1));
+		gmMeta.piCaches[iCon] = (int *)malloc(sizeof(int) * (iN - 2));
 		unsigned int iConN;
-		for (iConN = 0; iConN < (iN + 1); iConN++) {
+		for (iConN = 0; iConN < (iN - 2); iConN++) {
 			gmMeta.piCaches[iCon][iConN] = -1;
 		}
 	}
-
-
-	if (iN == 1) {
-		return 1;
+	int iResult = rProduce(iM, iN);
+	for (iCon = 0; iCon < (iM + 1); iCon++) {
+		free(gmMeta.piCaches[iCon]);
 	}
-	return rProduce(iM, iN);
+	free(gmMeta.piCaches);
+	return iResult;
 }
 
 
