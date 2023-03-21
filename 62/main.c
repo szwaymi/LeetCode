@@ -29,7 +29,7 @@ int rProduce(int iM, int iN) {
 	if (iN == 2) {
 		return iM;
 	}
-	if (gmMeta.piCaches[iM][iN - 2] != -1) {
+	if (iN < gmMeta.iN && gmMeta.piCaches[iM][iN - 2] != -1) {
 		return gmMeta.piCaches[iM][iN - 2];
 	}
 	unsigned int iCon;
@@ -37,13 +37,14 @@ int rProduce(int iM, int iN) {
 	for (iCon = 0; iCon < iM; iCon++) {
 		iSum += rProduce(iCon + 1, iN - 1);
 	}
-
-	gmMeta.piCaches[iM][iN - 2] = iSum;
+	if (iN < gmMeta.iN) {
+		gmMeta.piCaches[iM][iN - 2] = iSum;
+	}
 
 	return iSum;
 }
 int uniquePaths(int iM, int iN) {
-
+	gmMeta.iN = iN;
 	unsigned int iCon;
 	gmMeta.piCaches = (int **)malloc(sizeof(int *) * (iM + 1));
 	for (iCon = 0; iCon < (iM + 1); iCon++) {
