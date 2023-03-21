@@ -27,27 +27,23 @@ char * simplifyPath(char * pcIn){
                     }else{
                         pcOut--;
                     }
-                }else{
-                    *pcOut = '.';
-                    pcOut++;
-                    *pcOut = '.';
-                    pcOut++;
-                    while(*pcIn != '/' && *pcIn != 0){
-                        *pcOut = *pcIn;
-                        pcOut++;
-                        pcIn++;
-                    }
+                    continue;;
                 }
+                *pcOut = '.';
+                pcOut++;
+                *pcOut = '.';
+                pcOut++;
             }else if(*pcIn == '/' || *pcIn == 0){
                 pcOut--;
+                continue;;
             }else{
                 *pcOut = '.';
                 pcOut++;
-                while(*pcIn != '/' && *pcIn != 0){
-                    *pcOut = *pcIn;
-                    pcOut++;
-                    pcIn++;
-                }
+            }
+            while(*pcIn != '/' && *pcIn != 0){
+                *pcOut = *pcIn;
+                pcOut++;
+                pcIn++;
             }
         }else{
             unsigned int iLength = 0;
