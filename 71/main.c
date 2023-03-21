@@ -8,23 +8,63 @@ char * simplifyPath(char * pcIn){
     char *pcResult = (char *)malloc(sizeof(char) * (strlen(pcIn) + 1));
     char *pcOut = pcResult;
     while(*pcIn){
+        
+        if(*pcIn != '/'){return NULL;}
+        pcIn++;
+        *pcOut = '/';
+        pcOut++;
+        
         if(*pcIn == '.'){
             pcIn++;
             if(*pcIn == '.'){
-                if(pcOut > pcResult + 1){
-                    pcOut -= 2;
-                    while(*pcOut != '/'){
+                pcIn++;
+                if(*pcIn == '/' || *pcIn == 0){
+                    if(pcOut > pcResult + 1){
+                        pcOut -= 2;
+                        while(*pcOut != '/'){
+                            pcOut--;
+                        }
+                    }else{
                         pcOut--;
                     }
+                }else{
+                    *pcOut = '.';
                     pcOut++;
+                    *pcOut = '.';
+                    pcOut++;
+                    while(*pcIn != '/' && *pcIn != 0){
+                        *pcOut = *pcIn;
+                        pcOut++;
+                        pcIn++;
+                    }
+                }
+            }else if(*pcIn == '/' || *pcIn == 0){
+                pcOut--;
+            }else{
+                *pcOut = '.';
+                pcOut++;
+                while(*pcIn != '/' && *pcIn != 0){
+                    *pcOut = *pcIn;
+                    pcOut++;
+                    pcIn++;
                 }
             }
-            pcIn+=2;
         }else{
-            *pcOut = *pcIn;
-            pcOut++;
-            pcIn++;
+            unsigned int iLength = 0;
+            while(*pcIn != '/' && *pcIn != 0){
+                iLength++;
+                *pcOut = *pcIn;
+                pcIn++;
+                pcOut++;
+            }
+            if(iLength == 0){
+                pcOut--;
+            }
         }
+    }
+    if(pcOut == pcResult){
+        *pcOut = '/';
+        pcOut++;
     }
     *pcOut = 0;
     
@@ -53,7 +93,11 @@ int main(void){
     struct sTest mTest[]={
         M_TEST_COLLECTION(1, "/home/", "/home"),
         M_TEST_COLLECTION(2, "/../", "/"),
-        M_TEST_COLLECTION(3, "/home//foo/", "/home/foo/"),
+        M_TEST_COLLECTION(3, "/home//foo/", "/home/foo"),
+        M_TEST_COLLECTION(39, "/a/./b/../../c/", "/c"),
+        M_TEST_COLLECTION(189, "/a/../../b/../c//.//", "/c"),
+        M_TEST_COLLECTION(244, "/...", "/..."),
+        M_TEST_COLLECTION(251, "/.hidden", "/.hidden"),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
