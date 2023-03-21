@@ -29,8 +29,8 @@ int rProduce(int iM, int iN) {
 	if (iN == 2) {
 		return iM;
 	}
-	if (gmMeta.piCaches[iM][iN] != -1) {
-		return gmMeta.piCaches[iM][iN];
+	if (gmMeta.piCaches[iM][iN - 2] != -1) {
+		return gmMeta.piCaches[iM][iN - 2];
 	}
 	unsigned int iCon;
 	int iSum = 0;
@@ -38,7 +38,7 @@ int rProduce(int iM, int iN) {
 		iSum += rProduce(iCon + 1, iN - 1);
 	}
 
-	gmMeta.piCaches[iM][iN] = iSum;
+	gmMeta.piCaches[iM][iN - 2] = iSum;
 
 	return iSum;
 }
