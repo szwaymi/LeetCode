@@ -3,26 +3,70 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int rProduce(int iM, int iN) {
+int rVRF_Produce(int iM, int iN) {
 	if (iN == 2) {
 		return iM;
 	}
 	unsigned int iCon;
 	int iSum = 0;
 	for (iCon = 0; iCon < iM; iCon++) {
-		iSum += rProduce(iCon + 1, iN - 1);
+		iSum += rVRF_Produce(iCon + 1, iN - 1);
 	}
 	return iSum;
 }
+int rVRF_uniquePaths(int iM, int iN) {
+	if (iN == 1) {
+		return 1;
+	}
+	return rVRF_Produce(iM, iN);
+}
+static struct {
+	int **piCaches;
+	int iM;
+	int iN;
+}gmMeta;
+int rProduce(int iM, int iN) {
+	if (iN == 2) {
+		return iM;
+	}
+	if (gmMeta.piCaches[iM][iN] != -1) {
+		return gmMeta.piCaches[iM][iN];
+	}
+	unsigned int iCon;
+	int iSum = 0;
+	for (iCon = 0; iCon < iM; iCon++) {
+		iSum += rProduce(iCon + 1, iN - 1);
+	}
 
+	gmMeta.piCaches[iM][iN] = iSum;
+
+	return iSum;
+}
 int uniquePaths(int iM, int iN) {
+
+	unsigned int iCon;
+	gmMeta.piCaches = (int **)malloc(sizeof(int *) * (iM + 1));
+	for (iCon = 0; iCon < (iM + 1); iCon++) {
+		gmMeta.piCaches[iCon] = (int *)malloc(sizeof(int) * (iN + 1));
+		unsigned int iConN;
+		for (iConN = 0; iConN < (iN + 1); iConN++) {
+			gmMeta.piCaches[iCon][iConN] = -1;
+		}
+	}
+
+
 	if (iN == 1) {
 		return 1;
 	}
 	return rProduce(iM, iN);
 }
 
+
 int main(void){
+	printf("%d ", uniquePaths(13, 23));
+	printf("%d", rVRF_uniquePaths(4,3));
+	
+	/*
     //Test Data
     //  Macro
 #define M_TEST_INPUT
@@ -50,11 +94,15 @@ int main(void){
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
     for(iConTest = 0 ; iConTest < iLengthTest ; iConTest++){
+		int iResult;
         printf("Test Case [%d], ", mTest[iConTest].iNO);
         //Expectaion
         printf("Expecation = %d, ", mTest[iConTest].mExp.iNumber);
+		//Verification
+		iResult = rVRF_Produce(mTest[iConTest].mInput.iM, mTest[iConTest].mInput.iN);
+		printf("Verification = %d, ", iResult);
         //Result
-		int iResult = rProduce(mTest[iConTest].mInput.iM, mTest[iConTest].mInput.iN);
+		iResult = uniquePath(mTest[iConTest].mInput.iM, mTest[iConTest].mInput.iN);
         printf("Result = %d ", iResult);
         //Comparison
         int iTest = iResult == mTest[iConTest].mExp.iNumber;
@@ -75,4 +123,5 @@ int main(void){
         printf("[PASS]");
     }
     printf("\n");
+	*/
 }
