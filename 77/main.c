@@ -28,13 +28,25 @@ int** combine(int iRange, int iChose, int* piResults, int** ppiLengthes) {
 	int iResults = 1;
 	unsigned int iCon;
 	gpiTemp = (int *)malloc(sizeof(int) * iChose);
+	int iA;
+	int iB;
+	if (iChose > iRange / 2) {
+		iA = iChose;
+		iB = iRange - iChose;
+	}
+	else {
+		iA = iRange - iChose;
+		iB = iChose;
+	}
 
-	for (iCon = iRange - iChose; iCon < iRange; iCon++) {
+	for (iCon = iA; iCon < iRange; iCon++) {
 		iResults *= (iCon + 1);
 	}
-	for (iCon = 0; iCon < iChose; iCon++) {
+	for (iCon = 0; iCon < iB; iCon++) {
 		iResults /= (iCon + 1);
 	}
+
+
 	printf("[%d]\n", iResults);
 	int **ppiResults = (int **)malloc(sizeof(int *) * iResults);
 	int *piLengthes = (int *)malloc(sizeof(int) * iResults);
