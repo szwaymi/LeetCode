@@ -29,16 +29,17 @@ int** combine(int iRange, int iChose, int* piResults, int** ppiLengthes) {
 	unsigned int iCon;
 	gpiTemp = (int *)malloc(sizeof(int) * iChose);
 
-	for (iCon = iChose; iCon < iRange; iCon++) {
+	for (iCon = iRange - iChose; iCon < iRange; iCon++) {
 		iResults *= (iCon + 1);
 	}
 	for (iCon = 0; iCon < iChose; iCon++) {
 		iResults /= (iCon + 1);
 	}
-	int **ppiResults = (int *)malloc(sizeof(int *) * iResults);
-	int *piLengthes = (int)malloc(sizeof(int) * iResults);
+	printf("[%d]\n", iResults);
+	int **ppiResults = (int **)malloc(sizeof(int *) * iResults);
+	int *piLengthes = (int *)malloc(sizeof(int) * iResults);
 	for (iCon = 0; iCon < iResults; iCon++) {
-		ppiResults[iCon] = (int)malloc(sizeof(int) * iChose);
+		ppiResults[iCon] = (int *)malloc(sizeof(int) * iChose);
 		piLengthes[iCon] = iChose;
 	}
 	giChose = iChose;
@@ -51,6 +52,7 @@ int** combine(int iRange, int iChose, int* piResults, int** ppiLengthes) {
 	return ppiResults;
 }
 int main(void){
+
     //Test Data
     //  Macro
 #define M_TEST_INPUT
@@ -72,8 +74,12 @@ int main(void){
         struct sExp mExp;
     };
     //  Data
+	M_TEST_EXP(24, 2, { 1,1 });
 	M_TEST_EXP(1, 2, { 1,2 }, { 1,3 }, { 1,4 }, { 2,3 }, { 2,4 }, { 3,4 });
+	M_TEST_EXP(2, 2, { 1,1 });
     struct sTest mTest[]={
+		M_TEST_COLLECTION(24, 13, 13),
+		M_TEST_COLLECTION(2, 2, 2),
 		M_TEST_COLLECTION(1, 4, 2),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
