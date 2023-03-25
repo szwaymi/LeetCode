@@ -8,65 +8,92 @@
 #define false 0
 
 bool isNumber(char * pcNumber){
-    unsigned char iState = 0;
+    unsigned int iState = 0;
 
     while(*pcNumber){
         switch(iState){
-        case 0:
+        case 0x0:	//Sign Mark
             if(*pcNumber == ' '){
                 pcNumber++;
             }else if(*pcNumber == '+' || *pcNumber == '-'){
-                pcNumber++;
-                iState = 1;
+				iState = 0x100;
+				pcNumber++;
             }else if(*pcNumber >= '0' && *pcNumber <= '9'){
-                iState = 1;
+                iState = 0x100;
             }else if(*pcNumber == '.'){
                 pcNumber++;
-                iState = 2;
+                iState = 0x210;
             }else{
                 return false;
             }
             break;
-        case 1:
+        case 0x100:	//Integer Part
+		case 0x110:
             if(*pcNumber >= '0' && *pcNumber <= '9'){
+				iState = 0x110;
                 pcNumber++;
             }else if(*pcNumber == '.'){
                 pcNumber++;
-                iState = 2;
+				if (iState == 0x110) {
+					iState = 0x200;
+				}
+				else {
+					iState = 0x210;
+				}
             }else if(*pcNumber == 'e' || *pcNumber == 'E'){
+				if (iState != 0x110) {
+					return false;
+				}
                 pcNumber++;
-                iState = 5;
+                iState = 0x300;
             }else{
                 return false;
             }
             break;
-        case 2:
-        case 3:
+		//Decimal Part
+        case 0x200:	//Complete
+		case 0x210:	//Half
+		case 0x220:
             if(*pcNumber >= '0' && *pcNumber <= '9'){
-                iState = 3;
+				iState = 0x220;
                 pcNumber++;
             }else if(*pcNumber == 'e' || *pcNumber == 'E'){
+				if (iState == 0x210  ) { return false; }
                 pcNumber++;
-                iState = 5;
+                iState = 0x300;
             }else{
                 return false;
             }
             break;
-        case 5:
-        case 6:
-            if(*pcNumber >= '0' && *pcNumber <= '9'){
-                pcNumber++;
-                iState = 6;
+        case 0x300:	//Exponation Part
+			if (*pcNumber == '+' || *pcNumber == '-') {
+				iState = 0x400;
+				pcNumber++;
+			}else if(*pcNumber >= '0' && *pcNumber <= '9'){
+				iState = 0x410;
             }else{
                 return false;
             }
             break;
+		case 0x400:
+		case 0x410:
+			if (*pcNumber >= '0' && *pcNumber <= '9') {
+				iState = 0x410;
+				pcNumber++;
+			}
+			else {
+				return false;
+			}
+			break;
         }
     }
-    switch(iState){
-    case 2:return false;
-    case 5:return false;
-    }
+	switch (iState) {
+	case 0x100:
+	case 0x210:
+	case 0x300:
+	case 0x400:
+		return false;
+	}
     return true;
 }
 
@@ -90,6 +117,18 @@ int main(void){
     };
     //  Data
     struct sTest mTest[]={
+		M_TEST_COLLECTION(1490,"+", false),
+		M_TEST_COLLECTION(1487,"4e+", false),
+		M_TEST_COLLECTION(1472,"005047e+6", true),
+		M_TEST_COLLECTION(1450, "46.e3", true),
+		M_TEST_COLLECTION(1366, ".0e7", true),
+		M_TEST_COLLECTION(1364, "+E3", false),
+		M_TEST_COLLECTION(1362, "+.", false),
+		M_TEST_COLLECTION(1463, ".e1", false),
+		M_TEST_COLLECTION(1411, "0e", false),
+		M_TEST_COLLECTION(1360, ".1", true),
+		M_TEST_COLLECTION(3, ".", false),
+		M_TEST_COLLECTION(2, "e", false),
         M_TEST_COLLECTION(1, "0", true),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
