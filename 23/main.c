@@ -12,35 +12,31 @@ struct ListNode* mergeKLists(struct ListNode** ppmLists, int iLength) {
 	struct ListNode *pmHead = NULL;
 	struct ListNode **ppmNode = &pmHead;
 
-	struct {
-		int iLoc;
-		int iValue;
-	}mMin;
-	unsigned int iCon;
 	unsigned int iAcc;
-	do {
+	while(1) {
 		iAcc = 0;
-		mMin.iValue = 0x7FFFFFFF;
-		mMin.iLoc = -1;
+		struct ListNode **ppmCheck;
+		unsigned int iCon;
+		ppmCheck = NULL;
 		for (iCon = 0; iCon < iLength; iCon++) {
-			if (ppmLists[iCon] == NULL) {
-				iAcc++;
-			}
-			else{
-				if (ppmLists[iCon]->val < mMin.iValue) {
-					mMin.iValue = ppmLists[iCon]->val;
-					mMin.iLoc = iCon;
-				}
+			if (ppmLists[iCon]) {
+				ppmCheck = &ppmLists[iCon];
+				break;
 			}
 		}
-		if (iAcc < iLength) {
-			struct ListNode *pmNode = (struct ListNode *)malloc(sizeof(struct ListNode));
-			pmNode->val = mMin.iValue;
+		if (ppmCheck == NULL) { break; }
+		for (iCon = 0; iCon < iLength; iCon++) {
+			if (ppmLists[iCon] && (*ppmCheck)->val > ppmLists[iCon]->val) {
+				ppmCheck = &ppmLists[iCon];
+			}
+		}
+		{
+			struct ListNode *pmNode = *ppmCheck;
 			*ppmNode = pmNode;
 			ppmNode = &pmNode->next;
-			ppmLists[mMin.iLoc] = ppmLists[mMin.iLoc]->next;
+			*ppmCheck = (*ppmCheck)->next;
 		}
-	} while (iAcc < iLength);
+	}
 
 	*ppmNode = NULL;
 
