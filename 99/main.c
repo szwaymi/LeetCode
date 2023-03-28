@@ -44,98 +44,92 @@ int rTreeCheck(struct TreeNode *pmNode, unsigned int iLoc, T_INT *piSeries, unsi
 	iLocTemp = iLoc * 2 + 1;
 	if (iLocTemp < iLength && piSeries[iLocTemp] != null) {
 		int iResult =
-		rTreeCheck(pmNode->left, iLocTemp, piSeries, iLength);
+			rTreeCheck(pmNode->left, iLocTemp, piSeries, iLength);
 		if (iResult == 0) { return 0; }
 	}
 	iLocTemp = iLoc * 2 + 2;
 	if (iLocTemp < iLength && piSeries[iLocTemp] != null) {
 		int iResult =
-		rTreeCheck(&pmNode->right, iLocTemp, piSeries, iLength);
+			rTreeCheck(&pmNode->right, iLocTemp, piSeries, iLength);
 		if (iResult == 0) { return 0; }
 	}
 
 	return 1;
 }
-typedef int T_INT;
-
 int rCheck(struct TreeNode *pmNode) {
+#define M_SWAP(A, B) pmNodeA=A;pmNodeB=B;goto A_CHANGE
+	struct TreeNode *pmTop = pmNode;
+	struct TreeNode *pmLeft = pmNode->left;
+	struct TreeNode *pmRight = pmNode->right;
 	struct TreeNode *pmNodeA;
-	struct TreeNode *pmNodeB = NULL;
-	pmNodeA = pmNode;
-	if (pmNode->left) {
-		if (pmNodeA->val < pmNode->left->val) {
-			pmNodeB = pmNode->left;
-		}
-		else {
-			if (pmNode->left->left) {
-				T_INT iTemp;
-				iTemp = pmNode->left->left->val;
-				if (pmNodeA->val < iTemp) {
-					pmNodeB = pmNode->left->left;
-				}
-				else if (pmNode->left->val < iTemp) {
-					pmNodeA = pmNode->left;
-					pmNodeB = pmNode->left->left;
-				}
+	struct TreeNode *pmNodeB;
+	if ((pmLeft && pmRight) && pmTop->val < pmLeft->val && pmTop->val > pmRight->val) {
+		M_SWAP(pmLeft, pmRight);
+	}
+	if (pmLeft) {
+		if (pmLeft->left && pmLeft->left->val > pmLeft->val) {
+			if (pmLeft->val > pmTop->val) {
+				M_SWAP(pmLeft->left, pmTop);
 			}
-			if (pmNodeB == NULL && pmNode->left->right) {
-				T_INT iTemp;
-				iTemp = pmNode->left->right->val;
-				if (pmNodeA->val < iTemp) {
-					pmNodeB = pmNode->left->right;
-				}
-				else if (pmNode->left->val < iTemp) {
-					pmNodeA = pmNode->left;
-					pmNodeB = pmNode->left->right;
-				}
+			else {
+				M_SWAP(pmLeft->left, pmLeft);
 			}
 		}
-	}
-	if (pmNodeB) {
-		T_INT iTemp = pmNodeA->val;
-		pmNode->val = pmNodeB->val;
-		pmNodeB->val = iTemp;
-		return 1;
-	}
-
-	if (pmNode->right) {
-		if (pmNodeA->val > pmNode->right->val) {
-			pmNodeB = pmNode->right;
-		}
-		else {
-			if (pmNode->right->left) {
-				int iTemp;
-				iTemp = pmNode->right->left->val;
-				if (pmNodeA->val > iTemp) {
-					pmNodeB = pmNode->right->left;
+		else if (pmLeft->right) {
+			if (pmLeft->val > pmLeft->right->val)
+			{
+				if (pmTop->val < pmLeft->val) {
+					M_SWAP(pmLeft, pmTop);
 				}
-				else if (pmNode->right->val < iTemp) {
-					pmNodeA = pmNode->right;
-					pmNodeB = pmNode->right->left;
+				else {
+					M_SWAP(pmLeft->right, pmLeft);
 				}
 			}
-			if (pmNodeB == NULL && pmNode->right->right) {
-				int iTemp;
-				iTemp = pmNode->right->right->val;
-				if (pmNodeA->val > iTemp) {
-					pmNodeB = pmNode->right->right;
-				}
-				else if (pmNode->right->val > iTemp) {
-					pmNodeA = pmNode->right;
-					pmNodeB = pmNode->right->right;
-				}
+			else if (pmTop->val < pmLeft->right->val) {
+				M_SWAP(pmLeft->right, pmTop);
 			}
 		}
+		else if (pmLeft->val > pmTop->val)
+		{
+			M_SWAP(pmLeft, pmTop);
+		}
 	}
-	if (pmNodeB) {
-		int iTemp = pmNodeA->val;
-		pmNode->val = pmNodeB->val;
-		pmNodeB->val = iTemp;
-		return 1;
+	if (pmRight) {
+		if (pmRight->right && pmRight->val > pmRight->right->val) {
+			if (pmTop->val > pmRight->val) {
+				M_SWAP(pmRight->right, pmTop);
+			}
+			else {
+				M_SWAP(pmRight->right, pmRight);
+			}
+		}
+		else if (pmRight->left)
+		{
+			if (pmRight->val < pmRight->left->val) {
+				if (pmTop->val > pmRight->val) {
+					M_SWAP(pmRight, pmTop);
+				}
+				else {
+					M_SWAP(pmRight, pmRight->left);
+				}
+			}
+			else if (pmTop->val > pmRight->left->val) {
+				M_SWAP(pmRight->left, pmTop);
+			}
+		}
+		else if (pmTop->val > pmRight->val) {
+			M_SWAP(pmRight, pmTop);
+		}
 	}
-
-
 	return 0;
+
+A_CHANGE:
+	{
+		T_INT iTemp = pmNodeA->val;
+		pmNodeA->val = pmNodeB->val;
+		pmNodeB->val = iTemp;
+	}
+	return 1;
 }
 void rTraverse(struct TreeNode *pmNode) {
 	if (rCheck(pmNode)) {
@@ -151,26 +145,26 @@ void rTraverse(struct TreeNode *pmNode) {
 void recoverTree(struct TreeNode* pmRoot) {
 	rTraverse(pmRoot);
 }
-int main(void){
-    //Test Data
-    //  Macro
+int main(void) {
+	//Test Data
+	//  Macro
 #define M_TEST_INPUT(N, ...) T_INT iSeries_##N[] = {__VA_ARGS__};
 #define M_TEST_EXP(N, ...) T_INT iExp_##N[] = {__VA_ARGS__};
 #define M_TEST_COLLECTION(N) {N, {iSeries_##N, sizeof(iSeries_##N) / sizeof(T_INT)},{iExp_##N}}
-    //  Structure
-    struct sInput{
+	//  Structure
+	struct sInput {
 		T_INT *piSeries;
 		unsigned int iLength;
-    };
-    struct sExp{
+	};
+	struct sExp {
 		T_INT *piSeries;
-    };
-    struct sTest{
-        unsigned int iNO;
-        struct sInput mInput;
-        struct sExp mExp;
-    };
-    //  Data
+	};
+	struct sTest {
+		unsigned int iNO;
+		struct sInput mInput;
+		struct sExp mExp;
+	};
+	//  Data
 	//		#1
 	M_TEST_INPUT(1, 1, 3, null, null, 2);
 	M_TEST_EXP(1, 3, 1, null, null, 2);
@@ -180,38 +174,40 @@ int main(void){
 	//		#458
 	M_TEST_INPUT(458, 2, 3, 1);
 	M_TEST_EXP(458, 2, 1, 3);
-    struct sTest mTest[]={
+	struct sTest mTest[] = {
 		M_TEST_COLLECTION(2),
 		M_TEST_COLLECTION(1),
-    };
-    unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
-    unsigned int iConTest;
-    for(iConTest = 0 ; iConTest < iLengthTest ; iConTest++){
-        printf("Test Case [%d], ", mTest[iConTest].iNO);
-        //Expectaion
-        printf("Expecation = ");
-        //Result
+	};
+	unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
+	unsigned int iConTest;
+	for (iConTest = 0; iConTest < iLengthTest; iConTest++) {
+		printf("Test Case [%d], ", mTest[iConTest].iNO);
+		//Expectaion
+		printf("Expecation = ");
+		//Result
 		struct TreeNode *pmRoot;
 		rTreeBuild(&pmRoot, 0, mTest[iConTest].mInput.piSeries, mTest[iConTest].mInput.iLength);
 		recoverTree(pmRoot);
-        printf("Result = ");
-        //Comparison
-        int iTest = rTreeCheck(pmRoot, 0, mTest[iConTest].mExp.piSeries, mTest[iConTest].mInput.iLength);
-        if(iTest){
-            printf("[PASS]");
-        }else{
-            printf("[FAIL]");
-        }
-        printf("\n");
-        if(!iTest){
-            break;
-        }
-    }
-    printf("All Test Case : ");
-    if(iConTest < iLengthTest){
-        printf("[FAIL]");
-    }else{
-        printf("[PASS]");
-    }
-    printf("\n");
+		printf("Result = ");
+		//Comparison
+		int iTest = rTreeCheck(pmRoot, 0, mTest[iConTest].mExp.piSeries, mTest[iConTest].mInput.iLength);
+		if (iTest) {
+			printf("[PASS]");
+		}
+		else {
+			printf("[FAIL]");
+		}
+		printf("\n");
+		if (!iTest) {
+			break;
+		}
+	}
+	printf("All Test Case : ");
+	if (iConTest < iLengthTest) {
+		printf("[FAIL]");
+	}
+	else {
+		printf("[PASS]");
+	}
+	printf("\n");
 }
