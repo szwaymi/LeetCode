@@ -12,6 +12,33 @@ struct TreeNode {
 	struct TreeNode *right;
 };
 
+int rTreeShowLevel(unsigned char iTarget, unsigned char iLevel, struct TreeNode *pmNode) {
+	if (iLevel == iTarget) {
+		if (pmNode) {
+			printf("[%d] ", pmNode->val);
+			return 1;
+		}
+		else {
+			printf("[ ] ");
+			return 0;
+		}
+	}
+	int iResult = 0;
+	if (pmNode) {
+		iResult += rTreeShowLevel(iTarget, iLevel + 1, pmNode->left);
+		iResult += rTreeShowLevel(iTarget, iLevel + 1, pmNode->right);
+	}
+	return iResult;
+}
+void rTreeShow(struct TreeNode *pmNode) {
+	printf("\n");
+	unsigned int iLevel = 0;
+	while (rTreeShowLevel(iLevel, 0, pmNode)) {
+		iLevel++;
+		printf("\n");
+	}
+	printf("\n");
+}
 void rTreeBuild(struct TreeNode **ppmNode, unsigned int iLoc, T_INT *piSeries, unsigned int iLength) {
 	if (iLoc == iLength) { return; }
 	struct TreeNode *pmNode = (struct TreeNode *)malloc(sizeof(struct TreeNode));
@@ -50,7 +77,7 @@ int rTreeCheck(struct TreeNode *pmNode, unsigned int iLoc, T_INT *piSeries, unsi
 	iLocTemp = iLoc * 2 + 2;
 	if (iLocTemp < iLength && piSeries[iLocTemp] != null) {
 		int iResult =
-			rTreeCheck(&pmNode->right, iLocTemp, piSeries, iLength);
+			rTreeCheck(pmNode->right, iLocTemp, piSeries, iLength);
 		if (iResult == 0) { return 0; }
 	}
 
@@ -174,7 +201,12 @@ int main(void) {
 	//		#458
 	M_TEST_INPUT(458, 2, 3, 1);
 	M_TEST_EXP(458, 2, 1, 3);
+	//		#1070
+	M_TEST_INPUT(1070, 146, 71, -13, 55, null, 231, 399, 321, null, null, null, null, null, -33);
+	M_TEST_EXP(1070, 146, 71, 321, 55, null, 231, 399, -13, null, null, null, null, null, -33);
 	struct sTest mTest[] = {
+		M_TEST_COLLECTION(1070),
+		M_TEST_COLLECTION(458),
 		M_TEST_COLLECTION(2),
 		M_TEST_COLLECTION(1),
 	};
@@ -187,7 +219,9 @@ int main(void) {
 		//Result
 		struct TreeNode *pmRoot;
 		rTreeBuild(&pmRoot, 0, mTest[iConTest].mInput.piSeries, mTest[iConTest].mInput.iLength);
+		rTreeShow(pmRoot);
 		recoverTree(pmRoot);
+		rTreeShow(pmRoot);
 		printf("Result = ");
 		//Comparison
 		int iTest = rTreeCheck(pmRoot, 0, mTest[iConTest].mExp.piSeries, mTest[iConTest].mInput.iLength);
