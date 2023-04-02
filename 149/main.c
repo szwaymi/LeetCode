@@ -5,106 +5,43 @@
 
 int maxPoints(int** ppiSeries, int iLength, int* piCols) {
 
+    if(iLength < 3){
+        return iLength;
+    }
+    
 	struct sSlope{
 		int iWidth;
-		int iHight;
+		int iHeight;
 	};
 	struct sPoint {
 		int iX;
 		int iY;
-		struct sPoint *pmNext;
 	};
-	struct sLine {
-		struct sPoint mPoint;
-		struct sSlope mSlope;
-		unsigned int iPoints;
-		struct sLine *pmNext;
-	};
-
-	struct sLine *pmLines = NULL;
+	
 	unsigned int iConA;
 	unsigned int iConB;
-
-	for (iConA = 0; iConA < iLength; iConA++) {
-		for (iConB = iConA + 1; iConB < iLength; iConB++) {
-			//printf("[%d %d] = (%d %d) - (%d %d)", iConA, iConB, ppiSeries[iConA][0], ppiSeries[iConA][1], ppiSeries[iConB][0], ppiSeries[iConB][1]);
-			struct sSlope mSlope;
-			mSlope.iHight = ppiSeries[iConA][1] - ppiSeries[iConB][1];
-			mSlope.iWidth = ppiSeries[iConA][0] - ppiSeries[iConB][0];
-			struct sLine *pmLine = pmLines;
-			while (pmLine) {
-				if (mSlope.iWidth * pmLine->mSlope.iHight == mSlope.iHight * pmLine->mSlope.iWidth) {
-					struct sSlope mSlopeTemp;
-					mSlopeTemp.iHight = pmLine->mPoint.iY - ppiSeries[iConA][1];
-					mSlopeTemp.iWidth = pmLine->mPoint.iX - ppiSeries[iConA][0];
-					if (mSlopeTemp.iHight * pmLine->mSlope.iWidth == mSlopeTemp.iWidth * pmLine->mSlope.iHight) {
-						break;
-					}
-				}
-				pmLine = pmLine->pmNext;
-			}
-			if (pmLine == NULL) {
-				pmLine = (struct sLine *)malloc(sizeof(struct sLine));
-				pmLine->iPoints = 2;
-				pmLine->mPoint.iX = ppiSeries[iConA][0];
-				pmLine->mPoint.iY = ppiSeries[iConA][1];
-				struct sPoint *pmPoint = (struct sPoint *)malloc(sizeof(struct sPoint));
-				pmPoint->iX = ppiSeries[iConB][0];
-				pmPoint->iY = ppiSeries[iConB][1];
-				pmPoint->pmNext = NULL;
-				pmLine->mPoint.pmNext = pmPoint;
-				pmLine->mSlope.iWidth = mSlope.iWidth;
-				pmLine->mSlope.iHight = mSlope.iHight;
-				pmLine->pmNext = pmLines;
-				pmLines = pmLine;
-				//printf(" New Line\n");
-			}
-			else {
-				struct sPoint *pmPoint = &pmLine->mPoint;
-				unsigned char iHit = 0;
-				while (pmPoint) {
-					if (pmPoint->iX == ppiSeries[iConA][0] && pmPoint->iY == ppiSeries[iConA][1]) {
-						iHit |= 0x01;
-					}
-					if (pmPoint->iX == ppiSeries[iConB][0] && pmPoint->iY == ppiSeries[iConB][1]) {
-						iHit |= 0x02;
-					}
-					if (iHit == 0x03) {
-						break;
-					}
-					pmPoint = pmPoint->pmNext;
-				}
-				if ((iHit & 0x01) == 0) {
-					pmLine->iPoints++;
-					pmPoint = (struct sPoint *)malloc(sizeof(struct sPoint));
-					pmPoint->iX = ppiSeries[iConA][0];
-					pmPoint->iY = ppiSeries[iConA][1];
-					pmPoint->pmNext = pmLine->mPoint.pmNext;
-					pmLine->mPoint.pmNext = pmPoint;
-				}
-				if ((iHit & 0x02) == 0) {
-					pmLine->iPoints++;
-					pmPoint = (struct sPoint *)malloc(sizeof(struct sPoint));
-					pmPoint->iX = ppiSeries[iConB][0];
-					pmPoint->iY = ppiSeries[iConB][1];
-					pmPoint->pmNext = pmLine->mPoint.pmNext;
-					pmLine->mPoint.pmNext = pmPoint;
-				}
-				//printf(" Old Line:%d\n", pmLine->iPoints);
-			}
+    unsigned int iConC;
+    int iMax = 0;
+    
+	for (iConA = 0; iConA < iLength - 2; iConA++) {
+		for (iConB = iConA + 1; iConB < iLength - 1; iConB++) {
+            int iCount = 2;
+            struct sSlope mSlope;
+            mSlope.iWidth = ppiSeries[iConA][0] - ppiSeries[iConB][0];
+            mSlope.iHeight = ppiSeries[iConA][1] - ppiSeries[iConB][1];
+            for(iConC = iConB + 1 ; iConC < iLength ; iConC++){
+                struct sSlope mTemp;
+                mTemp.iWidth = ppiSeries[iConC][0] - ppiSeries[iConB][0];
+                mTemp.iHeight = ppiSeries[iConC][1] - ppiSeries[iConB][1];
+                if(mTemp.iWidth * mSlope.iHeight == mTemp.iHeight * mSlope.iWidth)
+                {
+                    iCount++;
+                }
+            }
+            if(iCount > iMax){iMax = iCount;}
 		}
 	}
 
-	int iMax = 0;
-	struct sLine *pmLine = pmLines;
-	while (pmLine) {
-		if (pmLine->iPoints > iMax) {
-			iMax = pmLine->iPoints;
-		}
-		struct sLine *pmTemp = pmLine;
-		pmLine = pmLine->pmNext;
-		free(pmTemp);
-	}
 	return iMax;
 }
 
