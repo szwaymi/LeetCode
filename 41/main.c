@@ -5,49 +5,34 @@
 
 int firstMissingPositive(int* piSeries, int iLength){
 
-    int iCon;
-    int iLenQualify;
-    int iLenTemp;
-    int iMax = 0;
-    int iMin = 0x7FFFFFFF;
-    unsigned long long iSum;
-    
-    //Remove Negative and Zero
-    iLenTemp = 0;
-    iSum = 0;
+    unsigned int iCon;
     for(iCon = 0 ; iCon < iLength ; iCon++){
-        if(piSeries[iCon] > 0){
-            iLenTemp++;
-            if(piSeries[iCon] > iMax){iMax = piSeries[iCon];}
-            if(piSeries[iCon] < iMin){iMin = piSeries[iCon];}
-            iSum += (unsigned long long)piSeries[iCon];
-        }
-    }
-    iLenQualify = iLenTemp;
-    
-    int iHole;
-    iHole = iMax - iLenQualify;
-    while(iHole > 1){
-        iLenTemp = 0;
-        iMax = 0;
-        for(iCon = 0 ; iCon < iLength ; iCon++){
-            if(piSeries[iCon] > iLenQualify){
-                iSum -= piSeries[iCon];
+        
+        int iLast = 0;
+        int *piValue = &piSeries[iCon];
+        int iLoc = iCon;
+        
+        while(1){
+            if(*piValue <= 0 || *piValue > iLength){
+                *piValue = iLast;
+                break;
+            }else if(*piValue != iLoc + 1){
+                iLoc = *piValue - 1;
+                *piValue = iLast;
+                piValue = &piSeries[iLoc];
+                iLast = iLoc + 1;
             }else{
-                if(piSeries[iCon] > iMax){iMax = piSeries[iCon];}
-                iLenTemp++;
+                break;
             }
         }
-        iHole = iMax - iLenTemp;
-    }
-    if(iHole){
-        unsigned long long iTemp = (1 + iMax) * iMax / 2;
-        return (int)(iTemp - iSum);
-    }else{
-        return iMax + 1;
     }
     
-    return 0;
+    for(iCon = 0 ; iCon < iLength ; iCon++){
+        if(piSeries[iCon] == 0){
+            return iCon + 1;
+        }
+    }
+    return iCon + 1;
 }
 
 int main(void){
@@ -78,7 +63,10 @@ int main(void){
     M_TEST_INPUT(3, 7, 8, 9, 11, 12);
     //      #31
     M_TEST_INPUT(31, 1, 1);
+    //      #165
+    M_TEST_INPUT(165, 1);
     struct sTest mTest[]={
+        M_TEST_COLLECTION(165, 2),
         M_TEST_COLLECTION(31, 2),
         M_TEST_COLLECTION(3, 1),
         M_TEST_COLLECTION(2, 2),
