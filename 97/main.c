@@ -29,6 +29,7 @@ int rCheck(char * pcSrcA, char * pcSrcB, char * pcDes){
     if(*pcDes == *pcSrcB){
         iResult += rCheck(pcSrcA, pcSrcB + 1, pcDes + 1);
     }
+    
     if(iResult){
         return true;
     }
@@ -62,6 +63,9 @@ int main(void){
     };
     //  Data
     struct sTest mTest[]={
+        M_TEST_COLLECTION(105, true, "aacaac", "aacaaeaac", "aacaacaaeaacaac"),
+        M_TEST_COLLECTION(100, false, "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa", "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab", "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab"),
+        M_TEST_COLLECTION(87, true, "aa", "ab", "aaba"),
         M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
         M_TEST_COLLECTION(1, true, "aabcc", "dbbca", "aadbbcbcac"),
     };
