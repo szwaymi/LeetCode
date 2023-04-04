@@ -22,16 +22,30 @@ int rCheck(char * pcSrcA, char * pcSrcB, char * pcDes){
         return false;
     }
     
+    int iSkipped = 0;
     int iResult = 0;
-    if(*pcDes == *pcSrcA){
-        iResult += rCheck(pcSrcA + 1, pcSrcB, pcDes + 1);
-    }
-    if(*pcDes == *pcSrcB){
-        iResult += rCheck(pcSrcA, pcSrcB + 1, pcDes + 1);
+    char cLast = *pcDes;
+    while(cLast == *pcSrcA && cLast == *pcSrcB && cLast == *pcDes){
+        pcSrcA++;
+        pcSrcB++;
+        pcDes++;
+        iSkipped++;
     }
     
-    if(iResult){
-        return true;
+    if(iSkipped){
+        iResult += rCheck(pcSrcA, pcSrcB - iSkipped, pcDes);
+        if(iResult){return true;}
+        iResult += rCheck(pcSrcA - iSkipped, pcSrcB, pcDes);
+        if(iResult){return true;}
+    }else{
+        if(*pcDes == *pcSrcA){
+            iResult += rCheck(pcSrcA + 1, pcSrcB, pcDes + 1);
+            if(iResult){return true;}
+        }
+        if(iResult == false && *pcDes == *pcSrcB){
+            iResult += rCheck(pcSrcA, pcSrcB + 1, pcDes + 1);
+            if(iResult){return true;}
+        }
     }
     return false;
 }
@@ -63,7 +77,9 @@ int main(void){
     };
     //  Data
     struct sTest mTest[]={
+        M_TEST_COLLECTION(106, false, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "babababababababababababababababababababababababababababababababababababababababababababababababaaaba", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
         M_TEST_COLLECTION(105, true, "aacaac", "aacaaeaac", "aacaacaaeaacaac"),
+        M_TEST_COLLECTION(104, true, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "abababababababababababababababababababababababababababababababababababababababababababababababababab", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
         M_TEST_COLLECTION(100, false, "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa", "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab", "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab"),
         M_TEST_COLLECTION(87, true, "aa", "ab", "aaba"),
         M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
