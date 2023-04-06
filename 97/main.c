@@ -12,45 +12,37 @@
 
 bool isInterleave(char * pcSrcA, char * pcSrcB, char * pcDes){
 
-	char *pcSource[2] = { pcSrcA, pcSrcB };
-	char *pcCheck = pcSource[0];
-	char *pcSearch = pcSource[1];
-	unsigned char iCheck = 0;
-	unsigned char iSearch = 1;
-	while (*pcDes) {
-		if (*pcCheck != *pcDes) {
-			char *pcHead = pcSearch;
-			while (*pcSearch == *pcDes)
-			{
-				pcSearch++;
-			}
-
-		}
-		pcCheck++;
-		if (*pcCheck == 0) {
-			iCheck++;
-			pcCheck = pcSource[iCheck % 2];
-		}
-		pcDes++;
-	}
-
-	/*
-	char *pcCheck = pcSrcA;
-	char *pcSearch = pcSrcB;
-	while (*pcDes) {
-		if (*pcCheck != *pcDes) {
-			while (*pcSearch != *pcDes) {
-				pcSearch++;
-			}
-
-		}
-		pcCheck++;
-		if (*pcCheck == 0) {
-			pcCheck = pcSrcB;
-		}
-		pcDes++;
-	}
-	*/
+    char *pcSearch = pcSrcB;
+    char *pcCheck = pcSrcA;
+    char *pcTail = NULL;
+    
+    while(*pcDes){
+        if(*pcDes != *pcCheck){
+            char *pcHead = pcSearch;
+            while(*pcDes != *pcSearch && *pcSearch != 0){
+                pcSearch++;
+            }
+            if(*pcSearch == 0){
+                return false;
+            }
+            if(pcTail == NULL){
+                char *pcTemp = pcCheck;
+                pcCheck = pcSearch;
+                pcSearch = pcTemp;
+            }else{
+                int iOffset = (int)(pcSearch - pcHead);
+                pcCheck = pcSearch;
+                pcSearch = pcTail - iOffset;
+                pcTail = NULL;
+            }
+        }
+        pcCheck++;
+        if(*pcCheck == 0){
+            pcTail = pcCheck;
+            pcCheck = pcSearch;
+        }
+        pcDes++;
+    }
 	return true;
 }
 
@@ -81,9 +73,9 @@ int main(void){
         //M_TEST_COLLECTION(104, true, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "abababababababababababababababababababababababababababababababababababababababababababababababababab", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
         //M_TEST_COLLECTION(100, false, "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa", "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab", "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab"),
         //M_TEST_COLLECTION(87, true, "aa", "ab", "aaba"),
-        //M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
+        M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
         //M_TEST_COLLECTION(1, true, "aabcc", "dbbca", "aadbbcbcac"),
-		M_TEST_COLLECTION(1024, true, "abc", "abcxyz", "abcxyzabc"),
+		//M_TEST_COLLECTION(1024, true, "abc", "abcxyz", "abcxyzabc"),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
