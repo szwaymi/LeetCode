@@ -3,26 +3,68 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static struct{
-    int iResult;
-    int iSource;
-}gmLength;
+struct sCache {
+	int iMethods;
+	struct sCache *pmNext;
+};
+
+static struct
+{
+	struct sCache *pmLast;
+	struct sCache *pmNow;
+}gmCaches;
 
 int rCheck(char *pcSource, char *pcProduction){
 	if (*pcProduction == 0) {
 		return 1;
 	}
+	gmCaches.pmNow = NULL;
+	struct sCache **ppmCache = &gmCaches.pmNow;
+	struct sCache *pmLast = NULL;
 	int iMethods = 0;
+	int iOffset = 0;
 	while (*pcSource) {
 		if (*pcSource == *pcProduction) {
-			iMethods += rCheck(pcSource + 1, pcProduction + 1);
+			int iTemp;
+			if (gmCaches.pmNow == NULL) {
+				iTemp = rCheck(pcSource + 1, pcProduction + 1);
+				pmLast = gmCaches.pmLast;
+			}
+			else {
+				iTemp = gmCaches.pmNow->iMethods - iOffset;
+			}
+			struct sCache *pmCache = (struct sCache *)malloc(sizeof(struct sCache));
+			pmCache->iMethods = iTemp;
+			*ppmCache = pmCache;
+			ppmCache = &pmCache->pmNext;
+			iMethods += iTemp;
 		}
 		pcSource++;
-   }
+		if (pmLast && *pcSource && *pcSource == *(pcProduction + 1)) {
+			iOffset += pmLast->iMethods;
+			pmLast = pmLast->pmNext;
+		}
+	}
+	*ppmCache = NULL;
+	while (gmCaches.pmLast) {
+		pmLast = gmCaches.pmLast;
+		gmCaches.pmLast = pmLast->pmNext;
+		free(pmLast);
+	}
+	gmCaches.pmLast = gmCaches.pmNow;
     return iMethods;
 }
 int numDistinct(char * pcSource, char * pcProduction){
-    return rCheck(pcSource, pcProduction);
+	gmCaches.pmLast = NULL;
+	gmCaches.pmNow = NULL;
+	int iMethods = rCheck(pcSource, pcProduction);
+	struct sCache *pmLast;
+	while (gmCaches.pmLast) {
+		pmLast = gmCaches.pmLast;
+		gmCaches.pmLast = pmLast->pmNext;
+		free(pmLast);
+	}
+	return iMethods;
 }
 int main(void){
     //Test Data
@@ -45,9 +87,9 @@ int main(void){
     };
     //  Data
     struct sTest mTest[]={
-        //M_TEST_COLLECTION(61, "xslledayhxhadmctrliaxqpokyezcfhzaskeykchkmhpyjipxtsuljkwkovmvelvwxzwieeuqnjozrfwmzsylcwvsthnxujvrkszqwtglewkycikdaiocglwzukwovsghkhyidevhbgffoqkpabthmqihcfxxzdejletqjoxmwftlxfcxgxgvpperwbqvhxgsbbkmphyomtbjzdjhcrcsggleiczpbfjcgtpycpmrjnckslrwduqlccqmgrdhxolfjafmsrfdghnatexyanldrdpxvvgujsztuffoymrfteholgonuaqndinadtumnuhkboyzaqguwqijwxxszngextfcozpetyownmyneehdwqmtpjloztswmzzdzqhuoxrblppqvyvsqhnhryvqsqogpnlqfulurexdtovqpqkfxxnqykgscxaskmksivoazlducanrqxynxlgvwonalpsyddqmaemcrrwvrjmjjnygyebwtqxehrclwsxzylbqexnxjcgspeynlbmetlkacnnbhmaizbadynajpibepbuacggxrqavfnwpcwxbzxfymhjcslghmajrirqzjqxpgtgisfjreqrqabssobbadmtmdknmakdigjqyqcruujlwmfoagrckdwyiglviyyrekjealvvigiesnvuumxgsveadrxlpwetioxibtdjblowblqvzpbrmhupyrdophjxvhgzclidzybajuxllacyhyphssvhcffxonysahvzhzbttyeeyiefhunbokiqrpqfcoxdxvefugapeevdoakxwzykmhbdytjbhigffkmbqmqxsoaiomgmmgwapzdosorcxxhejvgajyzdmzlcntqbapbpofdjtulstuzdrffafedufqwsknumcxbschdybosxkrabyfdejgyozwillcxpcaiehlelczioskqtptzaczobvyojdlyflilvwqgyrqmjaeepydrcchfyftjighntqzoo", "rwmimatmhydhbujebqehjprrwfkoebcxxqfktayaaeheys", 1024),
-        //M_TEST_COLLECTION(54, "adbdadeecadeadeccaeaabdabdbcdabddddabcaaadbabaaedeeddeaeebcdeabcaaaeeaeeabcddcebddebeebedaecccbdcbcedbdaeaedcdebeecdaaedaacadbdccabddaddacdddc", "bcddceeeebecbc", 700531452),
-        //M_TEST_COLLECTION(2, "babgbag", "bag", 5),
+        M_TEST_COLLECTION(61, "xslledayhxhadmctrliaxqpokyezcfhzaskeykchkmhpyjipxtsuljkwkovmvelvwxzwieeuqnjozrfwmzsylcwvsthnxujvrkszqwtglewkycikdaiocglwzukwovsghkhyidevhbgffoqkpabthmqihcfxxzdejletqjoxmwftlxfcxgxgvpperwbqvhxgsbbkmphyomtbjzdjhcrcsggleiczpbfjcgtpycpmrjnckslrwduqlccqmgrdhxolfjafmsrfdghnatexyanldrdpxvvgujsztuffoymrfteholgonuaqndinadtumnuhkboyzaqguwqijwxxszngextfcozpetyownmyneehdwqmtpjloztswmzzdzqhuoxrblppqvyvsqhnhryvqsqogpnlqfulurexdtovqpqkfxxnqykgscxaskmksivoazlducanrqxynxlgvwonalpsyddqmaemcrrwvrjmjjnygyebwtqxehrclwsxzylbqexnxjcgspeynlbmetlkacnnbhmaizbadynajpibepbuacggxrqavfnwpcwxbzxfymhjcslghmajrirqzjqxpgtgisfjreqrqabssobbadmtmdknmakdigjqyqcruujlwmfoagrckdwyiglviyyrekjealvvigiesnvuumxgsveadrxlpwetioxibtdjblowblqvzpbrmhupyrdophjxvhgzclidzybajuxllacyhyphssvhcffxonysahvzhzbttyeeyiefhunbokiqrpqfcoxdxvefugapeevdoakxwzykmhbdytjbhigffkmbqmqxsoaiomgmmgwapzdosorcxxhejvgajyzdmzlcntqbapbpofdjtulstuzdrffafedufqwsknumcxbschdybosxkrabyfdejgyozwillcxpcaiehlelczioskqtptzaczobvyojdlyflilvwqgyrqmjaeepydrcchfyftjighntqzoo", "rwmimatmhydhbujebqehjprrwfkoebcxxqfktayaaeheys", 543744000),
+        M_TEST_COLLECTION(54, "adbdadeecadeadeccaeaabdabdbcdabddddabcaaadbabaaedeeddeaeebcdeabcaaaeeaeeabcddcebddebeebedaecccbdcbcedbdaeaedcdebeecdaaedaacadbdccabddaddacdddc", "bcddceeeebecbc", 700531452),
+        M_TEST_COLLECTION(2, "babgbag", "bag", 5),
         M_TEST_COLLECTION(1, "rabbbit", "rabbit", 3),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
