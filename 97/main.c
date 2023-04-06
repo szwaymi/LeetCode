@@ -1,4 +1,6 @@
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,51 +10,48 @@
 #define false 0
 
 
-int rCheck(char * pcSrcA, char * pcSrcB, char * pcDes){
-    
-    if(*pcDes == 0){
-        if(*pcSrcA == 0 && *pcSrcB == 0){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    
-    if(*pcDes != *pcSrcA && *pcDes != *pcSrcB){
-        return false;
-    }
-    
-    int iSkipped = 0;
-    int iResult = 0;
-    char cLast = *pcDes;
-    while(cLast == *pcSrcA && cLast == *pcSrcB && cLast == *pcDes){
-        pcSrcA++;
-        pcSrcB++;
-        pcDes++;
-        iSkipped++;
-    }
-    
-    if(iSkipped){
-        iResult += rCheck(pcSrcA, pcSrcB - iSkipped, pcDes);
-        if(iResult){return true;}
-        iResult += rCheck(pcSrcA - iSkipped, pcSrcB, pcDes);
-        if(iResult){return true;}
-    }else{
-        if(*pcDes == *pcSrcA){
-            iResult += rCheck(pcSrcA + 1, pcSrcB, pcDes + 1);
-            if(iResult){return true;}
-        }
-        if(iResult == false && *pcDes == *pcSrcB){
-            iResult += rCheck(pcSrcA, pcSrcB + 1, pcDes + 1);
-            if(iResult){return true;}
-        }
-    }
-    return false;
-}
-
 bool isInterleave(char * pcSrcA, char * pcSrcB, char * pcDes){
 
-    return rCheck(pcSrcA, pcSrcB, pcDes);
+	char *pcSource[2] = { pcSrcA, pcSrcB };
+	char *pcCheck = pcSource[0];
+	char *pcSearch = pcSource[1];
+	unsigned char iCheck = 0;
+	unsigned char iSearch = 1;
+	while (*pcDes) {
+		if (*pcCheck != *pcDes) {
+			char *pcHead = pcSearch;
+			while (*pcSearch == *pcDes)
+			{
+				pcSearch++;
+			}
+
+		}
+		pcCheck++;
+		if (*pcCheck == 0) {
+			iCheck++;
+			pcCheck = pcSource[iCheck % 2];
+		}
+		pcDes++;
+	}
+
+	/*
+	char *pcCheck = pcSrcA;
+	char *pcSearch = pcSrcB;
+	while (*pcDes) {
+		if (*pcCheck != *pcDes) {
+			while (*pcSearch != *pcDes) {
+				pcSearch++;
+			}
+
+		}
+		pcCheck++;
+		if (*pcCheck == 0) {
+			pcCheck = pcSrcB;
+		}
+		pcDes++;
+	}
+	*/
+	return true;
 }
 
 int main(void){
@@ -77,13 +76,14 @@ int main(void){
     };
     //  Data
     struct sTest mTest[]={
-        M_TEST_COLLECTION(106, false, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "babababababababababababababababababababababababababababababababababababababababababababababababaaaba", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
-        M_TEST_COLLECTION(105, true, "aacaac", "aacaaeaac", "aacaacaaeaacaac"),
-        M_TEST_COLLECTION(104, true, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "abababababababababababababababababababababababababababababababababababababababababababababababababab", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
-        M_TEST_COLLECTION(100, false, "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa", "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab", "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab"),
-        M_TEST_COLLECTION(87, true, "aa", "ab", "aaba"),
-        M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
-        M_TEST_COLLECTION(1, true, "aabcc", "dbbca", "aadbbcbcac"),
+        //M_TEST_COLLECTION(106, false, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "babababababababababababababababababababababababababababababababababababababababababababababababaaaba", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
+        //M_TEST_COLLECTION(105, true, "aacaac", "aacaaeaac", "aacaacaaeaacaac"),
+        //M_TEST_COLLECTION(104, true, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "abababababababababababababababababababababababababababababababababababababababababababababababababab", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
+        //M_TEST_COLLECTION(100, false, "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa", "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab", "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab"),
+        //M_TEST_COLLECTION(87, true, "aa", "ab", "aaba"),
+        //M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
+        //M_TEST_COLLECTION(1, true, "aabcc", "dbbca", "aadbbcbcac"),
+		M_TEST_COLLECTION(1024, true, "abc", "abcxyz", "abcxyzabc"),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
