@@ -12,46 +12,47 @@
 
 bool isInterleave(char * pcSrcA, char * pcSrcB, char * pcDes){
 
-    char *pcSearch = pcSrcB;
-    char *pcCheck = pcSrcA;
-    char *pcTail = NULL;
+    char *pcSrcC = "";
+    struct sSegment{
+        char *pcHead;
+        char *pcTail;
+    };
+    struct sSegment mSegment[3] = {
+        {pcSrcC, pcSrcC},
+        {pcSrcB, pcSrcB},
+        {pcSrcA, pcSrcA}
+    };
+    unsigned int iLast = 2;
+    unsigned int iNow = 2;
+    unsigned int iNext = 1;
     
     while(*pcDes){
-        if(*pcDes != *pcCheck){
-            char *pcHead = pcSearch;
-            while(*pcDes != *pcSearch && *pcSearch != 0){
-                pcSearch++;
+        if(*pcDes != *mSegment[iNow].pcTail){
+            while(*pcDes != *mSegment[iNext].pcTail && *mSegment[iNext].pcTail){
+                mSegment[iNext].pcTail++;
             }
-            if(*pcSearch == 0){
+            if(*mSegment[iNext].pcTail == 0){
                 return false;
             }
-            if(pcTail == NULL){
-                int iOffset = (int)(pcSearch - pcHead);
-                pcDes -= (iOffset + 1);
-                pcSearch = pcCheck - iOffset;
-                pcCheck = pcHead - 1;
-                
-                /*
-                
-                char *pcTemp = pcCheck;
-                pcCheck = pcSearch;
-                pcSearch = pcTemp;
-                */
-                
-            }else{
-                int iOffset = (int)(pcSearch - pcHead);
-                pcCheck = pcSearch;
-                pcSearch = pcTail - iOffset;
-                pcTail = NULL;
+            int iOffset = (int)(mSegment[iNext].pcTail - mSegment[iNext].pcHead);
+            mSegment[iLast].pcTail -= iOffset;
+            iNow = iNext;
+            mSegment[iNow].pcTail -= iOffset;
+            iNext = (iNext + 1) % 2;
+            mSegment[iNext].pcHead = mSegment[iLast].pcTail;
+            mSegment[iNext].pcTail = mSegment[iNext].pcHead;
+            iLast = iNow;
+            pcDes -= iOffset;
+        }else{
+            mSegment[iNow].pcTail++;
+            if(*mSegment[iNow].pcTail == 0){
+                iNow = (iNow + 1) % 2;
             }
+            pcDes++;
         }
-        pcCheck++;
-        if(*pcCheck == 0){
-            pcTail = pcCheck;
-            pcCheck = pcSearch;
-        }
-        pcDes++;
     }
+    
+    
 	return true;
 }
 
@@ -83,9 +84,11 @@ int main(void){
         //M_TEST_COLLECTION(104, true, "abababababababababababababababababababababababababababababababababababababababababababababababababbb", "abababababababababababababababababababababababababababababababababababababababababababababababababab", "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababbb"),
         //M_TEST_COLLECTION(100, false, "bbbbbabbbbabaababaaaabbababbaaabbabbaaabaaaaababbbababbbbbabbbbababbabaabababbbaabababababbbaaababaa", "babaaaabbababbbabbbbaabaabbaabbbbaabaaabaababaaaabaaabbaaabaaaabaabaabbbbbbbbbbbabaaabbababbabbabaab", "babbbabbbaaabbababbbbababaabbabaabaaabbbbabbbaaabbbaaaaabbbbaabbaaabababbaaaaaabababbababaababbababbbababbbbaaaabaabbabbaaaaabbabbaaaabbbaabaaabaababaababbaaabbbbbabbbbaabbabaabbbbabaaabbababbabbabbab"),
         //M_TEST_COLLECTION(87, true, "aa", "ab", "aaba"),
-        M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
+        M_TEST_COLLECTION(54, true, "aabd", "abdc", "aabdabcd"),
+        //M_TEST_COLLECTION(49, false, "a", "b", "a"),
+        //M_TEST_COLLECTION(2, false, "aabcc", "dbbca", "aadbbbaccc"),
         M_TEST_COLLECTION(1, true, "aabcc", "dbbca", "aadbbcbcac"),
-		
+		M_TEST_COLLECTION(2048, true, "abc", "xyz", "axbycz"),
     };
     unsigned int iLengthTest = sizeof(mTest) / sizeof(struct sTest);
     unsigned int iConTest;
