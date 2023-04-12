@@ -32,15 +32,19 @@ bool isInterleave(char * pcSrcA, char * pcSrcB, char * pcDes){
                 mSegment[iNext].pcTail++;
             }
             if(*mSegment[iNext].pcTail == 0){
-                return false;
+                iNext = (iNext + 1) % 2;
+                while(*pcDes != *mSegment[iNext].pcTail && *mSegment[iNext].pcTail){
+                    mSegment[iNext].pcTail++;
+                }
+                if(*mSegment[iNext].pcTail == 0){
+                    return false;
+                }
             }
             int iOffset = (int)(mSegment[iNext].pcTail - mSegment[iNext].pcHead);
             mSegment[iLast].pcTail -= iOffset;
             iNow = iNext;
+            
             mSegment[iNow].pcTail -= iOffset;
-            iNext = (iNext + 1) % 2;
-            mSegment[iNext].pcHead = mSegment[iLast].pcTail;
-            mSegment[iNext].pcTail = mSegment[iNext].pcHead;
             iLast = iNow;
             pcDes -= iOffset;
         }else{
